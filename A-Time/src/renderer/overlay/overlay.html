@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>A-Time Overlay</title>
+  <link rel="stylesheet" href="overlay.css" />
+</head>
+<body>
+  <div id="bar" class="overlay-bar">
+    <!-- Proportional section segments fill this track -->
+    <div id="track" class="track"></div>
+
+    <!-- Overlaid info (click-through) -->
+    <div class="info">
+      <span id="sectionTitle" class="info-section-title"></span>
+      <span class="info-group">
+        <span class="info-label">Section</span>
+        <span id="sectionRemaining" class="info-value">0:00</span>
+      </span>
+      <span class="info-group">
+        <span class="info-label">Total</span>
+        <span id="totalRemaining" class="info-value">0:00</span>
+      </span>
+      <span class="info-group">
+        <span id="clock" class="info-value info-clock">--:--</span>
+      </span>
+    </div>
+
+    <!-- Interactive controls cluster (only clickable region) -->
+    <div id="controls" class="controls">
+      <button id="btnPause" class="ctrl" title="Pause (Space)">❚❚</button>
+      <button id="btnResume" class="ctrl" title="Resume (Space)" hidden>▶</button>
+      <button id="btnReset" class="ctrl" title="Restart (⌘R)">⟲</button>
+      <button id="btnStop" class="ctrl ctrl-stop" title="Stop (Esc)">■</button>
+    </div>
+  </div>
+  <script type="module" src="overlay.js"></script>
+</body>
+</html>

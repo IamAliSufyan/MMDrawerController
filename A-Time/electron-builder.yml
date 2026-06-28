@@ -1,0 +1,49 @@
+appId: com.atime.app
+productName: A-Time
+copyright: Copyright © 2026 A-Time
+
+directories:
+  output: dist
+  buildResources: build
+
+# Only ship what the app needs at runtime. scripts/iconGen.js is included
+# because the tray falls back to it to render the menu bar icon.
+files:
+  - package.json
+  - src/**/*
+  - scripts/iconGen.js
+  - build/tray/**/*
+  - "!**/*.md"
+  - "!test/**"
+
+mac:
+  category: public.app-category.productivity
+  icon: build/icon.icns
+  target:
+    - target: dmg
+      arch: universal
+  # Support the latest macOS and the previous two major versions. Electron 31
+  # runs on macOS 11+, so this comfortably covers the three latest releases.
+  minimumSystemVersion: "12.0"
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # This app lives in the menu bar only (LSUIElement hides it from the Dock).
+  extendInfo:
+    LSUIElement: 1
+    NSAppleEventsUsageDescription: A-Time uses system events to display the timer overlay.
+
+dmg:
+  title: A-Time ${version}
+  icon: build/icon.icns
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+  window:
+    width: 540
+    height: 380

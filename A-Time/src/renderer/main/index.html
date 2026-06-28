@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>A-Time</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="app-header">
+    <div class="app-brand">A-Time</div>
+    <nav class="tabs">
+      <button class="tab active" data-tab="timers">Timers</button>
+      <button class="tab" data-tab="settings">Settings</button>
+    </nav>
+  </header>
+  <main id="content" class="content"></main>
+  <script type="module" src="app.js"></script>
+</body>
+</html>

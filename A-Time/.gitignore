@@ -1,0 +1,15 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Generated icon assets (recreated by `npm run icons`)
+build/icon.png
+build/icon.icns
+build/icon.iconset/
+build/tray/
+
+# OS / editor
+.DS_Store
+*.log

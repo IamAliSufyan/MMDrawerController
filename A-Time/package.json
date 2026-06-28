@@ -1,0 +1,27 @@
+{
+  "name": "a-time",
+  "productName": "A-Time",
+  "version": "1.0.0",
+  "description": "A-Time — a macOS menu bar presentation timer with a click-through overlay progress bar.",
+  "author": {
+    "name": "A-Time"
+  },
+  "license": "MIT",
+  "main": "src/main/main.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "icons": "node scripts/generate-icons.js",
+    "build": "npm run icons && electron-builder --mac --universal",
+    "dmg": "bash scripts/make-dmg.sh",
+    "pack": "electron-builder --dir"
+  },
+  "dependencies": {
+    "electron-store": "^8.2.0"
+  },
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3"
+  }
+}

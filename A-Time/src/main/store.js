@@ -14,7 +14,12 @@ const DEFAULT_SETTINGS = {
   overlayOpacity: 0.95, // 0..1
   monitorBehavior: 'main', // 'main' | 'all' | 'specific'
   specificDisplayId: null, // numeric display id when monitorBehavior === 'specific'
-  overlayGap: 8 // px below the menu bar
+  overlayGap: 8, // px below the menu bar
+  // Overlay position/size on screen. null = use defaults (left 0, top below the
+  // menu bar, full screen width). These are set when the user drags/resizes.
+  overlayLeft: null, // px from the display's left edge
+  overlayTop: null, // px from the display's top edge
+  overlayWidth: null // px width; null = full screen width
 };
 
 /**

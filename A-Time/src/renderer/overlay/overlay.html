@@ -8,31 +8,60 @@
 </head>
 <body>
   <div id="bar" class="overlay-bar">
-    <!-- Proportional section segments fill this track -->
+    <!-- Drag grip (left) — move the overlay around the screen -->
+    <div id="dragHandle" class="grip drag-handle interactive" title="Drag to move">⠿</div>
+
+    <!-- Proportional section segments; each shows its own name + remaining time -->
     <div id="track" class="track"></div>
 
-    <!-- Overlaid info (click-through) -->
-    <div class="info">
-      <span id="sectionTitle" class="info-section-title"></span>
-      <span class="info-group">
-        <span class="info-label">Section</span>
-        <span id="sectionRemaining" class="info-value">0:00</span>
+    <!-- Totals + clock, shown at the end before the controls -->
+    <div class="totals">
+      <span class="totals-group">
+        <span class="totals-label">Total</span>
+        <span id="totalRemaining" class="totals-value">0:00</span>
       </span>
-      <span class="info-group">
-        <span class="info-label">Total</span>
-        <span id="totalRemaining" class="info-value">0:00</span>
-      </span>
-      <span class="info-group">
-        <span id="clock" class="info-value info-clock">--:--</span>
-      </span>
+      <span id="clock" class="clock">--:--</span>
     </div>
 
-    <!-- Interactive controls cluster (only clickable region) -->
-    <div id="controls" class="controls">
-      <button id="btnPause" class="ctrl" title="Pause (Space)">❚❚</button>
-      <button id="btnResume" class="ctrl" title="Resume (Space)" hidden>▶</button>
+    <!-- Interactive controls cluster -->
+    <div id="controls" class="controls interactive">
+      <button id="btnToggle" class="ctrl" title="Pause / Resume (Space)">❚❚</button>
       <button id="btnReset" class="ctrl" title="Restart (⌘R)">⟲</button>
       <button id="btnStop" class="ctrl ctrl-stop" title="Stop (Esc)">■</button>
+      <button id="btnMenu" class="ctrl" title="Overlay settings">⋯</button>
+    </div>
+
+    <!-- Resize grip (right edge) — change the overlay width -->
+    <div id="resizeHandle" class="resize-handle interactive" title="Drag to resize width"></div>
+
+    <!-- Settings popup (opened from the ⋯ menu) -->
+    <div id="menuPopup" class="menu-popup interactive" hidden>
+      <div class="mp-row">
+        <label for="mpHeight">Height</label>
+        <input type="range" id="mpHeight" min="28" max="80" step="1" />
+        <span id="mpHeightVal" class="mp-val"></span>
+      </div>
+      <div class="mp-row">
+        <label for="mpOpacity">Opacity</label>
+        <input type="range" id="mpOpacity" min="0.2" max="1" step="0.01" />
+        <span id="mpOpacityVal" class="mp-val"></span>
+      </div>
+      <div class="mp-row">
+        <label for="mpGap">Top gap</label>
+        <input type="range" id="mpGap" min="0" max="40" step="1" />
+        <span id="mpGapVal" class="mp-val"></span>
+      </div>
+      <div class="mp-row">
+        <label>Monitor</label>
+        <button id="mpMonitor" class="mp-btn mp-cycle" title="Click to change">Main screen</button>
+      </div>
+      <div class="mp-row" id="mpDisplayRow" hidden>
+        <label>Display</label>
+        <button id="mpDisplay" class="mp-btn mp-cycle" title="Click to cycle displays">—</button>
+      </div>
+      <div class="mp-row mp-reset-row">
+        <button id="mpResetPos" class="mp-btn">Reset position &amp; size</button>
+      </div>
     </div>
   </div>
   <script type="module" src="overlay.js"></script>

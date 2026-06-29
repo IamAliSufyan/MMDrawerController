@@ -4,6 +4,8 @@
   --overlay-height: 46px;
   --overlay-opacity: 0.95;
   --overlay-top: 30px;
+  --overlay-left: 0px;
+  --overlay-width: 100vw;
   /* Light mode defaults */
   --bar-bg: rgba(245, 245, 247, 0.92);
   --track-empty: #e2e2e6;
@@ -12,6 +14,8 @@
   --shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   --ctrl-bg: rgba(0, 0, 0, 0.06);
   --ctrl-hover: rgba(0, 0, 0, 0.14);
+  --divider: rgba(0, 0, 0, 0.12);
+  --popup-bg: rgba(250, 250, 252, 0.98);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +27,8 @@
     --shadow: 0 4px 18px rgba(0, 0, 0, 0.5);
     --ctrl-bg: rgba(255, 255, 255, 0.10);
     --ctrl-hover: rgba(255, 255, 255, 0.22);
+    --divider: rgba(255, 255, 255, 0.16);
+    --popup-bg: rgba(40, 40, 43, 0.98);
   }
 }
 
@@ -39,33 +45,67 @@ html, body {
 .overlay-bar {
   position: absolute;
   top: var(--overlay-top);
-  left: 0;
-  width: 100vw;
+  left: var(--overlay-left);
+  width: var(--overlay-width);
   height: var(--overlay-height);
   opacity: var(--overlay-opacity);
   background: var(--bar-bg);
   box-shadow: var(--shadow);
   border-radius: 10px;
-  overflow: hidden;
   display: flex;
   align-items: stretch;
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
 }
 
+/* ---- Grips ---- */
+.grip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+.drag-handle {
+  width: 22px;
+  cursor: grab;
+  font-size: 14px;
+  letter-spacing: -2px;
+  border-radius: 10px 0 0 10px;
+}
+.drag-handle:active { cursor: grabbing; }
+.drag-handle:hover { background: var(--ctrl-hover); }
+
+.resize-handle {
+  width: 8px;
+  cursor: ew-resize;
+  flex: 0 0 auto;
+  border-radius: 0 10px 10px 0;
+  background: linear-gradient(to right, transparent, var(--divider));
+}
+.resize-handle:hover { background: var(--ctrl-hover); }
+
 /* ---- Section track ---- */
 .track {
-  position: absolute;
-  inset: 0;
+  flex: 1 1 auto;
   display: flex;
   gap: 2px;
+  min-width: 0;
+  padding: 4px;
 }
 
 .section {
   position: relative;
   height: 100%;
+  flex-basis: 0;
   background: var(--track-empty);
+  border-radius: 5px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 7px;
+  min-width: 0;
 }
 
 .section-fill {
@@ -75,73 +115,52 @@ html, body {
   bottom: 0;
   width: 0%;
   transition: width 0.2s linear;
+  z-index: 0;
 }
 
-/* ---- Overlaid info ---- */
-.info {
+.section-name,
+.section-time {
   position: relative;
-  z-index: 2;
+  z-index: 1;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-color);
+  white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.35);
+}
+@media (prefers-color-scheme: dark) {
+  .section-name, .section-time { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6); }
+}
+.section-name { overflow: hidden; text-overflow: ellipsis; margin-right: 6px; }
+.section-time { font-variant-numeric: tabular-nums; flex: 0 0 auto; }
+.section.is-done .section-name,
+.section.is-done .section-time { opacity: 0.55; }
+
+/* ---- Totals + clock ---- */
+.totals {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
-  gap: 18px;
-  height: 100%;
-  padding: 0 16px;
+  gap: 12px;
+  padding: 0 12px;
+  border-left: 1px solid var(--divider);
   color: var(--text-color);
-  flex: 1 1 auto;
-  min-width: 0;
-  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.25);
-  pointer-events: none;
 }
+.totals-group { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; }
+.totals-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text-muted); }
+.totals-value { font-size: 14px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.clock { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
 
-@media (prefers-color-scheme: dark) {
-  .info { text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
-}
-
-.info-section-title {
-  font-weight: 600;
-  font-size: 14px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 40%;
-}
-
-.info-group {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  white-space: nowrap;
-}
-
-.info-label {
-  font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.4px;
-  color: var(--text-muted);
-}
-
-.info-value {
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.info-clock { color: var(--text-muted); font-weight: 500; }
-
-/* ---- Controls (interactive) ---- */
+/* ---- Controls ---- */
 .controls {
-  position: relative;
-  z-index: 3;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 0 12px 0 10px;
-  height: 100%;
-  pointer-events: auto;
+  padding: 0 8px;
+  flex: 0 0 auto;
+  border-left: 1px solid var(--divider);
 }
-
 .ctrl {
-  -webkit-app-region: no-drag;
   width: 28px;
   height: 28px;
   border: none;
@@ -156,7 +175,32 @@ html, body {
   justify-content: center;
   transition: background 0.15s ease;
 }
-
 .ctrl:hover { background: var(--ctrl-hover); }
 .ctrl:active { transform: scale(0.94); }
 .ctrl-stop { color: #ff453a; }
+
+/* ---- Settings popup ---- */
+.menu-popup {
+  position: absolute;
+  top: calc(var(--overlay-height) + 8px);
+  right: 6px;
+  width: 280px;
+  background: var(--popup-bg);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  color: var(--text-color);
+}
+.menu-popup[hidden] { display: none; }
+.mp-row { display: flex; align-items: center; gap: 10px; }
+.mp-row label { width: 64px; font-size: 12px; font-weight: 600; flex: 0 0 auto; }
+.mp-row input[type="range"] { flex: 1; accent-color: #4c8bf5; }
+.mp-val { width: 40px; text-align: right; font-size: 11px; color: var(--text-muted); font-variant-numeric: tabular-nums; }
+.mp-select { flex: 1; border-radius: 7px; padding: 4px 6px; font-size: 12px; }
+.mp-reset-row { justify-content: flex-end; }
+.mp-btn { border: none; background: var(--ctrl-bg); color: var(--text-color); border-radius: 7px; padding: 6px 10px; font-size: 12px; font-weight: 600; cursor: pointer; }
+.mp-btn:hover { background: var(--ctrl-hover); }
+.mp-cycle { flex: 1; text-align: left; }

@@ -56,6 +56,7 @@ class OverlayManager {
   show(timerMeta, settings) {
     this.hide(); // clear any stragglers
     this.lastTimerMeta = timerMeta;
+    this._monitorKey = this._keyFor(settings);
     const displays = this._targetDisplays(settings);
 
     for (const display of displays) {
@@ -65,19 +66,35 @@ class OverlayManager {
 
       win.webContents.once('did-finish-load', () => {
         if (win.isDestroyed()) return;
-        win.webContents.send('overlay:config', {
-          height: settings.overlayHeight,
-          opacity: settings.overlayOpacity,
-          gap: settings.overlayGap,
-          menuBarOffset: display.bounds.height - display.workArea.height > 0
-            ? display.workArea.y - display.bounds.y
-            : 0
-        });
+        win.webContents.send('overlay:config', this._buildConfig(settings, display));
         win.webContents.send('overlay:init', timerMeta);
         win.showInactive(); // show without taking focus
       });
     }
     this.active = true;
+  }
+
+  /** A key describing which displays the overlay should render on. */
+  _keyFor(settings) {
+    return `${settings.monitorBehavior}:${settings.specificDisplayId || ''}`;
+  }
+
+  /** Build the renderer config (size, opacity, position) for a display. */
+  _buildConfig(settings, display) {
+    const menuBarOffset = display
+      ? Math.max(0, display.workArea.y - display.bounds.y)
+      : 0;
+    return {
+      height: settings.overlayHeight,
+      opacity: settings.overlayOpacity,
+      gap: settings.overlayGap,
+      menuBarOffset,
+      left: settings.overlayLeft,
+      top: settings.overlayTop,
+      width: settings.overlayWidth,
+      displayWidth: display ? display.bounds.width : null,
+      displayHeight: display ? display.bounds.height : null
+    };
   }
 
   /** Push a timer state snapshot to every overlay window. */
@@ -87,17 +104,20 @@ class OverlayManager {
     }
   }
 
-  /** Re-apply live settings (opacity/height/gap) without recreating windows. */
+  /**
+   * Re-apply live settings. Size/opacity/position update in place; a change to
+   * which monitor(s) to use rebuilds the overlay windows.
+   */
   applySettings(settings) {
+    // If the target displays changed, rebuild the overlay windows entirely.
+    if (this.isActive() && this.lastTimerMeta && this._keyFor(settings) !== this._monitorKey) {
+      this.show(this.lastTimerMeta, settings);
+      return;
+    }
     for (const { win, displayId } of this.windows) {
       if (win.isDestroyed()) continue;
       const display = screen.getAllDisplays().find((d) => d.id === displayId);
-      win.webContents.send('overlay:config', {
-        height: settings.overlayHeight,
-        opacity: settings.overlayOpacity,
-        gap: settings.overlayGap,
-        menuBarOffset: display ? (display.workArea.y - display.bounds.y) : 0
-      });
+      win.webContents.send('overlay:config', this._buildConfig(settings, display));
     }
   }
 

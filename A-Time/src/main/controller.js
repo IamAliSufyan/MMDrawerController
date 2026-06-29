@@ -223,6 +223,17 @@ class TimerController {
     unregisterShortcuts();
   }
 
+  /**
+   * Stop the running timer if it is the one being deleted, so deleting a timer
+   * from the app window also clears its overlay / menu bar countdown.
+   */
+  stopIfDeleted(timerId) {
+    if (this.currentTimer && this.currentTimer.id === timerId) {
+      this.stop();
+      this.currentTimer = null;
+    }
+  }
+
   /** Re-apply settings live to a visible overlay. */
   applySettings() {
     if (this.overlay.isActive()) {

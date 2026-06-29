@@ -1,63 +1,74 @@
 'use strict';
 
 /**
- * Overlay renderer: draws the segmented progress bar, keeps it in sync with the
- * timer state pushed from the main process, renders the click-through info, and
- * exposes the small interactive controls cluster.
+ * Overlay renderer.
+ *
+ * Draws the segmented progress bar (each section shows its own name on the left
+ * and its remaining time on the right), the total remaining + clock before the
+ * controls, and a settings popup. The bar can be dragged to move and resized
+ * from its right edge. The whole window is click-through except elements marked
+ * `.interactive` (grips, controls, popup).
  */
 
 const api = window.atime;
 const root = document.documentElement;
 const bar = document.getElementById('bar');
 const track = document.getElementById('track');
-const controls = document.getElementById('controls');
 
 const els = {
-  sectionTitle: document.getElementById('sectionTitle'),
-  sectionRemaining: document.getElementById('sectionRemaining'),
   totalRemaining: document.getElementById('totalRemaining'),
   clock: document.getElementById('clock'),
-  btnPause: document.getElementById('btnPause'),
-  btnResume: document.getElementById('btnResume'),
+  btnToggle: document.getElementById('btnToggle'),
   btnReset: document.getElementById('btnReset'),
-  btnStop: document.getElementById('btnStop')
+  btnStop: document.getElementById('btnStop'),
+  btnMenu: document.getElementById('btnMenu'),
+  dragHandle: document.getElementById('dragHandle'),
+  resizeHandle: document.getElementById('resizeHandle'),
+  menuPopup: document.getElementById('menuPopup')
 };
 
-let segments = []; // { el, fill, duration }
+let segments = []; // { el, fill, nameEl, timeEl, duration }
+let cfg = { menuBarOffset: 0, gap: 8, displayWidth: window.innerWidth, displayHeight: window.innerHeight };
 
-// ---- Configuration (height / opacity / position) -------------------------
-api.overlay.onConfig((cfg) => {
-  if (!cfg) return;
-  root.style.setProperty('--overlay-height', `${cfg.height}px`);
-  root.style.setProperty('--overlay-opacity', String(cfg.opacity));
-  // Position the bar just below the menu bar (menuBarOffset) plus the gap.
-  const top = (cfg.menuBarOffset || 0) + (cfg.gap || 8);
-  root.style.setProperty('--overlay-top', `${top}px`);
+// ---- Configuration (size / opacity / position) ---------------------------
+api.overlay.onConfig((c) => {
+  if (!c) return;
+  cfg = { ...cfg, ...c };
+  root.style.setProperty('--overlay-height', `${c.height}px`);
+  root.style.setProperty('--overlay-opacity', String(c.opacity));
+  root.style.setProperty('--overlay-left', c.left != null ? `${c.left}px` : '0px');
+  const defaultTop = (c.menuBarOffset || 0) + (c.gap || 8);
+  root.style.setProperty('--overlay-top', `${c.top != null ? c.top : defaultTop}px`);
+  root.style.setProperty('--overlay-width', c.width != null ? `${c.width}px` : '100vw');
 });
 
-// ---- Build the section segments on init ----------------------------------
-api.overlay.onInit((meta) => {
-  buildSegments(meta);
-});
+// ---- Build section segments on init --------------------------------------
+api.overlay.onInit((meta) => buildSegments(meta));
 
 function buildSegments(meta) {
   track.innerHTML = '';
   segments = [];
-  const total = Math.max(1, meta.totalDuration);
   for (const section of meta.sections) {
     const seg = document.createElement('div');
     seg.className = 'section';
-    // Proportional width across the full bar.
     seg.style.flexGrow = String(Math.max(0.0001, section.duration));
     seg.style.flexBasis = '0';
 
     const fill = document.createElement('div');
     fill.className = 'section-fill';
     fill.style.background = section.color || '#cccccc';
-    seg.appendChild(fill);
 
+    const nameEl = document.createElement('span');
+    nameEl.className = 'section-name';
+    nameEl.textContent = section.name || '';
+
+    const timeEl = document.createElement('span');
+    timeEl.className = 'section-time';
+    timeEl.textContent = api.calc.formatClock(section.duration);
+
+    seg.append(fill, nameEl, timeEl);
     track.appendChild(seg);
-    segments.push({ el: seg, fill, duration: section.duration });
+    segments.push({ el: seg, fill, nameEl, timeEl, duration: section.duration });
   }
 }
 
@@ -65,28 +76,31 @@ function buildSegments(meta) {
 api.overlay.onState((state) => {
   if (!state) return;
   if (segments.length !== state.sections.length) {
-    // Defensive: rebuild if structure changed (e.g. settings reset).
-    buildSegments({ totalDuration: state.totalDuration, sections: state.sections });
+    buildSegments({ sections: state.sections });
   }
 
   for (let i = 0; i < segments.length; i++) {
     const seg = segments[i];
     let pct = 0;
-    if (i < state.currentIndex) pct = 100;
-    else if (i === state.currentIndex) {
+    let remaining = seg.duration; // upcoming sections show their full length
+    if (i < state.currentIndex) { pct = 100; remaining = 0; }        // done
+    else if (i === state.currentIndex) {                              // active
       pct = seg.duration > 0 ? Math.min(100, (state.sectionElapsed / seg.duration) * 100) : 100;
+      remaining = state.sectionRemaining;
     }
     seg.fill.style.width = `${pct}%`;
+    seg.timeEl.textContent = api.calc.formatClock(remaining);
+    seg.el.classList.toggle('is-done', i < state.currentIndex);
+    const name = state.sections[i].name || '';
+    if (seg.nameEl.textContent !== name) seg.nameEl.textContent = name;
   }
 
-  els.sectionTitle.textContent = state.currentName || '';
-  els.sectionRemaining.textContent = api.calc.formatClock(state.sectionRemaining);
   els.totalRemaining.textContent = api.calc.formatClock(state.totalRemaining);
   els.clock.textContent = currentClock();
 
-  // Toggle pause/resume button visibility.
-  els.btnPause.hidden = state.paused;
-  els.btnResume.hidden = !state.paused;
+  // One toggle button: pause icon while running, play icon while paused.
+  els.btnToggle.textContent = state.paused ? '▶' : '❚❚';
+  els.btnToggle.title = state.paused ? 'Resume (Space)' : 'Pause (Space)';
 });
 
 function currentClock() {
@@ -97,28 +111,167 @@ function currentClock() {
   const hour12 = ((h + 11) % 12) + 1;
   return `${hour12}:${m} ${ampm}`;
 }
+// Keep the clock ticking even while paused (state ticks stop on pause).
+setInterval(() => { els.clock.textContent = currentClock(); }, 1000);
 
 // ---- Controls -------------------------------------------------------------
-els.btnPause.addEventListener('click', () => api.control.pause());
-els.btnResume.addEventListener('click', () => api.control.resume());
+els.btnToggle.addEventListener('click', () => api.control.togglePause());
 els.btnReset.addEventListener('click', () => api.control.reset());
 els.btnStop.addEventListener('click', () => api.control.stop());
+els.btnMenu.addEventListener('click', () => toggleMenu());
 
-// Make ONLY the controls clickable: the window is click-through by default
-// (forwarding mouse-move events), so when the pointer is over the controls we
-// disable click-through, and re-enable it when the pointer leaves.
-function enableClicks() { api.overlay.setIgnoreMouse(false); }
-function disableClicks() { api.overlay.setIgnoreMouse(true); }
+// ---- Click-through management --------------------------------------------
+// The window is click-through by default. We enable hit-testing only when the
+// pointer is over an `.interactive` element (grips, controls, popup), or while
+// a drag/resize gesture is in progress.
+let clicksEnabled = null;
+function enableClicks() { if (clicksEnabled !== true) { clicksEnabled = true; api.overlay.setIgnoreMouse(false); } }
+function disableClicks() { if (clicksEnabled !== false) { clicksEnabled = false; api.overlay.setIgnoreMouse(true); } }
+disableClicks();
 
-controls.addEventListener('mouseenter', enableClicks);
-controls.addEventListener('mouseleave', disableClicks);
-// Fallback using forwarded mousemove: enable when over controls, else disable.
-window.addEventListener('mousemove', (e) => {
-  const rect = controls.getBoundingClientRect();
-  const inside = e.clientX >= rect.left && e.clientX <= rect.right &&
-    e.clientY >= rect.top && e.clientY <= rect.bottom;
-  if (inside) enableClicks();
+function updateInteractivity(x, y) {
+  if (dragging || resizing) { enableClicks(); return; }
+  const el = document.elementFromPoint(x, y);
+  if (el && el.closest('.interactive')) enableClicks();
   else disableClicks();
+}
+
+// ---- Drag to move + resize width -----------------------------------------
+let dragging = false;
+let resizing = false;
+let dragOffset = { x: 0, y: 0 };
+let pending = { left: null, top: null, width: null };
+
+els.dragHandle.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  dragging = true;
+  const rect = bar.getBoundingClientRect();
+  dragOffset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+});
+
+els.resizeHandle.addEventListener('mousedown', (e) => {
+  e.preventDefault();
+  resizing = true;
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (dragging) {
+    const rect = bar.getBoundingClientRect();
+    const maxLeft = (cfg.displayWidth || window.innerWidth) - rect.width;
+    const maxTop = (cfg.displayHeight || window.innerHeight) - rect.height;
+    const left = clamp(e.clientX - dragOffset.x, 0, Math.max(0, maxLeft));
+    const top = clamp(e.clientY - dragOffset.y, 0, Math.max(0, maxTop));
+    root.style.setProperty('--overlay-left', `${left}px`);
+    root.style.setProperty('--overlay-top', `${top}px`);
+    pending.left = Math.round(left);
+    pending.top = Math.round(top);
+  } else if (resizing) {
+    const rect = bar.getBoundingClientRect();
+    const maxWidth = (cfg.displayWidth || window.innerWidth) - rect.left;
+    const width = clamp(e.clientX - rect.left, 360, Math.max(360, maxWidth));
+    root.style.setProperty('--overlay-width', `${width}px`);
+    pending.width = Math.round(width);
+  }
+  updateInteractivity(e.clientX, e.clientY);
+});
+
+window.addEventListener('mouseup', (e) => {
+  if (dragging || resizing) {
+    const partial = {};
+    if (pending.left != null) { partial.overlayLeft = pending.left; partial.overlayTop = pending.top; }
+    if (pending.width != null) partial.overlayWidth = pending.width;
+    pending = { left: null, top: null, width: null };
+    dragging = false;
+    resizing = false;
+    if (Object.keys(partial).length) api.settings.save(partial);
+  }
+  updateInteractivity(e.clientX, e.clientY);
+});
+
+function clamp(v, min, max) { return Math.min(max, Math.max(min, v)); }
+
+// ---- Settings popup -------------------------------------------------------
+const mp = {
+  height: document.getElementById('mpHeight'),
+  heightVal: document.getElementById('mpHeightVal'),
+  opacity: document.getElementById('mpOpacity'),
+  opacityVal: document.getElementById('mpOpacityVal'),
+  gap: document.getElementById('mpGap'),
+  gapVal: document.getElementById('mpGapVal'),
+  monitor: document.getElementById('mpMonitor'),
+  displayRow: document.getElementById('mpDisplayRow'),
+  display: document.getElementById('mpDisplay'),
+  resetPos: document.getElementById('mpResetPos')
+};
+
+// Native <select> dropdowns can misbehave in a non-focusable overlay window,
+// so monitor + display are chosen via cycle buttons instead.
+const MONITOR_ORDER = ['main', 'all', 'specific'];
+const MONITOR_LABELS = { main: 'Main screen', all: 'All screens', specific: 'Specific' };
+let menuState = { behavior: 'main', displays: [], specificId: null };
+
+async function toggleMenu() {
+  if (!els.menuPopup.hidden) { els.menuPopup.hidden = true; return; }
+  await populateMenu();
+  els.menuPopup.hidden = false;
+}
+
+async function populateMenu() {
+  const s = await api.settings.get();
+  mp.height.value = s.overlayHeight; mp.heightVal.textContent = `${s.overlayHeight}px`;
+  mp.opacity.value = s.overlayOpacity; mp.opacityVal.textContent = `${Math.round(s.overlayOpacity * 100)}%`;
+  mp.gap.value = s.overlayGap; mp.gapVal.textContent = `${s.overlayGap}px`;
+
+  try { menuState.displays = await api.displays.list(); } catch (_) { menuState.displays = []; }
+  menuState.behavior = s.monitorBehavior;
+  menuState.specificId = s.specificDisplayId != null
+    ? s.specificDisplayId
+    : (menuState.displays[0] && menuState.displays[0].id) || null;
+  renderMonitorButtons();
+}
+
+function renderMonitorButtons() {
+  mp.monitor.textContent = MONITOR_LABELS[menuState.behavior] || 'Main screen';
+  mp.displayRow.hidden = menuState.behavior !== 'specific';
+  const d = menuState.displays.find((x) => x.id === menuState.specificId);
+  mp.display.textContent = d ? `${d.label}${d.isPrimary ? ' (Primary)' : ''}` : '—';
+}
+
+mp.height.addEventListener('input', () => {
+  mp.heightVal.textContent = `${mp.height.value}px`;
+  api.settings.save({ overlayHeight: Number(mp.height.value) });
+});
+mp.opacity.addEventListener('input', () => {
+  mp.opacityVal.textContent = `${Math.round(Number(mp.opacity.value) * 100)}%`;
+  api.settings.save({ overlayOpacity: Number(mp.opacity.value) });
+});
+mp.gap.addEventListener('input', () => {
+  mp.gapVal.textContent = `${mp.gap.value}px`;
+  api.settings.save({ overlayGap: Number(mp.gap.value) });
+});
+
+mp.monitor.addEventListener('click', () => {
+  const next = (MONITOR_ORDER.indexOf(menuState.behavior) + 1) % MONITOR_ORDER.length;
+  menuState.behavior = MONITOR_ORDER[next];
+  renderMonitorButtons();
+  const partial = { monitorBehavior: menuState.behavior };
+  if (menuState.behavior === 'specific' && menuState.specificId != null) {
+    partial.specificDisplayId = menuState.specificId;
+  }
+  api.settings.save(partial);
+});
+
+mp.display.addEventListener('click', () => {
+  if (!menuState.displays.length) return;
+  const idx = menuState.displays.findIndex((x) => x.id === menuState.specificId);
+  const nextDisplay = menuState.displays[(idx + 1) % menuState.displays.length];
+  menuState.specificId = nextDisplay.id;
+  renderMonitorButtons();
+  api.settings.save({ monitorBehavior: 'specific', specificDisplayId: menuState.specificId });
+});
+
+mp.resetPos.addEventListener('click', () => {
+  api.settings.save({ overlayLeft: null, overlayTop: null, overlayWidth: null });
 });
 
 // ---- Built-in sounds (synthesized, no external files) ---------------------
@@ -131,7 +284,6 @@ function ensureAudio() {
   return audioCtx;
 }
 
-/** Play a short tone (or sequence) using the Web Audio API. */
 function tone(freqs, duration, type = 'sine', gainPeak = 0.18) {
   const ctx = ensureAudio();
   if (!ctx) return;
@@ -152,11 +304,6 @@ function tone(freqs, duration, type = 'sine', gainPeak = 0.18) {
 }
 
 api.overlay.onSound((kind) => {
-  if (kind === 'section') {
-    // Soft single chime when a section ends.
-    tone([880], 0.35, 'sine', 0.16);
-  } else if (kind === 'complete') {
-    // Distinct ascending three-note chord at the very end.
-    tone([523.25, 659.25, 783.99], 0.6, 'triangle', 0.2);
-  }
+  if (kind === 'section') tone([880], 0.35, 'sine', 0.16);
+  else if (kind === 'complete') tone([523.25, 659.25, 783.99], 0.6, 'triangle', 0.2);
 });

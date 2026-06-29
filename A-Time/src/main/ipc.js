@@ -28,6 +28,8 @@ function registerIpc({ controller, overlay }) {
   });
 
   ipcMain.handle('timers:delete', (_e, id) => {
+    // If the timer being deleted is currently running, stop it first.
+    controller.stopIfDeleted(id);
     store.deleteTimer(id);
     return { ok: true };
   });

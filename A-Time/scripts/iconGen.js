@@ -184,15 +184,52 @@ function drawAppIcon(size) {
   return cv;
 }
 
+/** Alpha (0..1, anti-aliased) for a point inside a rounded rectangle. */
+function roundedRectAlpha(px, py, x, y, w, h, r) {
+  if (px < x || px > x + w || py < y || py > y + h) return 0;
+  const dxEdge = Math.min(px - x, x + w - px);
+  const dyEdge = Math.min(py - y, y + h - py);
+  if (dxEdge < r && dyEdge < r) {
+    const ddx = r - dxEdge;
+    const ddy = r - dyEdge;
+    const d = Math.sqrt(ddx * ddx + ddy * ddy);
+    if (d > r) return 0;
+    if (d > r - 1) return r - d;
+  }
+  return 1;
+}
+
 /**
- * The tray icon: a compact colorful segmented ring (no background) so it reads
- * well in the menu bar.
+ * The tray icon: a horizontal progress bar split into several colored sections
+ * (mirrors the overlay), so it reads clearly in the menu bar.
  */
 function drawTrayIcon(size) {
   const cv = makeCanvas(size);
-  const cx = size / 2;
-  const cy = size / 2;
-  drawRing(cv, cx, cy, size * 0.46, size * 0.24, DEFAULT_PALETTE);
+  const n = 4; // number of sections
+  const colors = DEFAULT_PALETTE.slice(0, n);
+
+  const barW = size - 2;
+  const barH = Math.round(size * 0.5);
+  const barX = 1;
+  const barY = Math.round((size - barH) / 2);
+  const radius = Math.max(2, Math.round(barH * 0.32));
+  const gap = Math.max(1, Math.round(size * 0.045)); // separation between sections
+  const segW = barW / n;
+
+  for (let py = barY - 1; py <= barY + barH + 1; py++) {
+    for (let px = barX - 1; px <= barX + barW + 1; px++) {
+      const a = roundedRectAlpha(px + 0.5, py + 0.5, barX, barY, barW, barH, radius);
+      if (a <= 0) continue;
+      const local = px - barX;
+      let seg = Math.floor(local / segW);
+      if (seg < 0) seg = 0;
+      if (seg > n - 1) seg = n - 1;
+      const offset = local - seg * segW;
+      if (seg > 0 && offset < gap) continue; // transparent gap between sections
+      const [r, g, b] = hexToRgb(colors[seg]);
+      setPixel(cv, px, py, r, g, b, Math.round(a * 255));
+    }
+  }
   return cv;
 }
 

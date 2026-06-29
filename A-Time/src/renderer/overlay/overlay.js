@@ -10,6 +10,8 @@
  * `.interactive` (grips, controls, popup).
  */
 
+import { icon } from '../shared/icons.js';
+
 const api = window.atime;
 const root = document.documentElement;
 const bar = document.getElementById('bar');
@@ -29,6 +31,12 @@ const els = {
   resizeHandle: document.getElementById('resizeHandle'),
   menuPopup: document.getElementById('menuPopup')
 };
+
+// Render the control-button icons once.
+els.btnReset.innerHTML = icon('reset');
+els.btnStop.innerHTML = icon('stop');
+els.btnMenu.innerHTML = icon('ellipsis');
+els.btnToggle.innerHTML = icon('pause');
 
 let segments = []; // { el, fill, nameEl, timeEl, duration }
 let cfg = { menuBarOffset: 0, gap: 8, displayWidth: window.innerWidth, displayHeight: window.innerHeight };
@@ -122,8 +130,12 @@ api.overlay.onState((state) => {
   bar.classList.toggle('overrun', state.overrun);
 
   // One toggle button: pause icon while running, play icon while paused.
-  els.btnToggle.textContent = state.paused ? '▶' : '❚❚';
-  els.btnToggle.title = state.paused ? 'Resume (Space)' : 'Pause (Space)';
+  const wantPlay = state.paused;
+  if (els.btnToggle.dataset.icon !== (wantPlay ? 'play' : 'pause')) {
+    els.btnToggle.dataset.icon = wantPlay ? 'play' : 'pause';
+    els.btnToggle.innerHTML = icon(wantPlay ? 'play' : 'pause');
+  }
+  els.btnToggle.title = wantPlay ? 'Resume (Space)' : 'Pause (Space)';
 });
 
 // ---- Controls -------------------------------------------------------------

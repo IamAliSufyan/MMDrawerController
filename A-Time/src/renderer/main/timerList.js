@@ -5,6 +5,8 @@
  * section count, a mini color preview, and Play / Edit / Duplicate / Delete.
  */
 
+import { icon } from '../shared/icons.js';
+
 const api = window.atime;
 
 function sectionPreview(sections) {
@@ -42,10 +44,10 @@ export function createTimerCard(timer, handlers) {
   const actions = document.createElement('div');
   actions.className = 'card-actions';
 
-  const playBtn = iconButton('▶', 'Play', 'card-play');
-  const editBtn = iconButton('✎', 'Edit');
-  const dupBtn = iconButton('⧉', 'Duplicate');
-  const delBtn = iconButton('🗑', 'Delete', 'card-delete');
+  const playBtn = iconButton('play', 'Play', 'card-play');
+  const editBtn = iconButton('edit', 'Edit');
+  const dupBtn = iconButton('copy', 'Duplicate');
+  const delBtn = iconButton('trash', 'Delete', 'card-delete');
 
   playBtn.addEventListener('click', () => handlers.onPlay(timer.id));
   editBtn.addEventListener('click', () => handlers.onEdit(timer.id));
@@ -57,12 +59,12 @@ export function createTimerCard(timer, handlers) {
   return card;
 }
 
-function iconButton(glyph, label, extraClass = '') {
+function iconButton(iconName, label, extraClass = '') {
   const btn = document.createElement('button');
   btn.className = `card-btn ${extraClass}`.trim();
   btn.title = label;
   btn.setAttribute('aria-label', label);
-  btn.textContent = glyph;
+  btn.innerHTML = icon(iconName, 16);
   return btn;
 }
 

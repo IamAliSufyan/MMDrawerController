@@ -82,9 +82,13 @@ html, body {
   font-weight: 600;
   padding: 9px;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 }
 .new-btn:hover { filter: brightness(1.06); }
-.new-btn .plus { font-weight: 400; margin-right: 4px; }
+.pbtn svg, .new-btn svg, .icon-btn svg { display: block; }
 
 .list { display: flex; flex-direction: column; gap: 4px; max-height: 380px; overflow-y: auto; }
 

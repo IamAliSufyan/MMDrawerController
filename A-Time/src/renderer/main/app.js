@@ -8,6 +8,7 @@
 import { createTimerCard } from './timerList.js';
 import { createTimerForm } from './timerForm.js';
 import { createSettingsView } from './settings.js';
+import { icon } from '../shared/icons.js';
 
 const api = window.atime;
 const content = document.getElementById('content');
@@ -36,7 +37,7 @@ async function renderList() {
 
   const newBtn = document.createElement('button');
   newBtn.className = 'btn btn-new';
-  newBtn.innerHTML = '<span class="plus">+</span> New Timer';
+  newBtn.innerHTML = `${icon('plus', 18)}<span>New Timer</span>`;
   newBtn.addEventListener('click', () => renderForm(null));
   view.appendChild(newBtn);
 

@@ -7,15 +7,19 @@
  * process so the window hugs its content.
  */
 
+import { icon } from '../shared/icons.js';
+
 const api = window.atime;
 const listEl = document.getElementById('list');
 
-document.getElementById('newBtn').addEventListener('click', () => {
-  api.app.openMain({ view: 'form' });
-});
-document.getElementById('settingsBtn').addEventListener('click', () => {
-  api.app.openMain({ view: 'settings' });
-});
+const newBtn = document.getElementById('newBtn');
+newBtn.innerHTML = `${icon('plus', 15)}<span>New Timer</span>`;
+newBtn.addEventListener('click', () => api.app.openMain({ view: 'form' }));
+
+const settingsBtn = document.getElementById('settingsBtn');
+settingsBtn.innerHTML = icon('gear', 16);
+settingsBtn.addEventListener('click', () => api.app.openMain({ view: 'settings' }));
+
 document.getElementById('quitBtn').addEventListener('click', () => api.app.quit());
 
 function fmt(t) {
@@ -54,10 +58,10 @@ function buildCard(timer) {
     <div class="pcard-name">${escapeHtml(timer.name)}</div>
     <div class="pcard-meta">${fmt(timer)}</div>
     <div class="pcard-actions">
-      <button class="pbtn pbtn-play" title="Play">▶</button>
-      <button class="pbtn pbtn-edit" title="Edit">✎</button>
-      <button class="pbtn pbtn-dup" title="Duplicate">⧉</button>
-      <button class="pbtn pbtn-del" title="Delete">🗑</button>
+      <button class="pbtn pbtn-play" title="Play">${icon('play', 15)}</button>
+      <button class="pbtn pbtn-edit" title="Edit">${icon('edit', 15)}</button>
+      <button class="pbtn pbtn-dup" title="Duplicate">${icon('copy', 15)}</button>
+      <button class="pbtn pbtn-del" title="Delete">${icon('trash', 15)}</button>
     </div>
   `;
 

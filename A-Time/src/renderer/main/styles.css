@@ -118,9 +118,15 @@ html, body {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 .btn-new:hover { background: var(--accent); filter: brightness(1.05); }
-.btn-new .plus { font-size: 18px; font-weight: 400; margin-right: 6px; }
+
+/* Inline SVG icons inherit the button's color and center nicely. */
+.card-btn svg, .btn-new svg { display: block; }
 
 /* ---- Timer list ---- */
 .timer-list { display: flex; flex-direction: column; gap: 10px; }

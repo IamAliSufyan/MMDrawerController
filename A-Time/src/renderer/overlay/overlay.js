@@ -26,7 +26,7 @@ const els = {
 let segments = []; // { el, fill, duration }
 
 // ---- Configuration (height / opacity / position) -------------------------
-api.onConfig((cfg) => {
+api.overlay.onConfig((cfg) => {
   if (!cfg) return;
   root.style.setProperty('--overlay-height', `${cfg.height}px`);
   root.style.setProperty('--overlay-opacity', String(cfg.opacity));
@@ -36,7 +36,7 @@ api.onConfig((cfg) => {
 });
 
 // ---- Build the section segments on init ----------------------------------
-api.onInit((meta) => {
+api.overlay.onInit((meta) => {
   buildSegments(meta);
 });
 
@@ -62,7 +62,7 @@ function buildSegments(meta) {
 }
 
 // ---- Apply timer state ----------------------------------------------------
-api.onState((state) => {
+api.overlay.onState((state) => {
   if (!state) return;
   if (segments.length !== state.sections.length) {
     // Defensive: rebuild if structure changed (e.g. settings reset).
@@ -151,7 +151,7 @@ function tone(freqs, duration, type = 'sine', gainPeak = 0.18) {
   });
 }
 
-api.onSound((kind) => {
+api.overlay.onSound((kind) => {
   if (kind === 'section') {
     // Soft single chime when a section ends.
     tone([880], 0.35, 'sine', 0.16);

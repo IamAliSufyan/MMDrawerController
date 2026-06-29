@@ -87,9 +87,12 @@ function positionPopover(trayBounds) {
 }
 
 function init() {
-  // Menu bar only app: hide the Dock icon on macOS.
-  if (process.platform === 'darwin' && app.dock) {
-    app.dock.hide();
+  // Menu bar only app: keep it out of the Dock. setActivationPolicy('accessory')
+  // is the durable fix — dock.hide() alone lets the icon reappear once a window
+  // (splash / main) is shown.
+  if (process.platform === 'darwin') {
+    if (app.dock) app.dock.hide();
+    try { app.setActivationPolicy('accessory'); } catch (_) { /* older Electron */ }
   }
 
   store.seedIfNeeded();

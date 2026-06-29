@@ -17,7 +17,6 @@ const track = document.getElementById('track');
 
 const els = {
   totalRemaining: document.getElementById('totalRemaining'),
-  clock: document.getElementById('clock'),
   btnToggle: document.getElementById('btnToggle'),
   btnReset: document.getElementById('btnReset'),
   btnStop: document.getElementById('btnStop'),
@@ -96,23 +95,11 @@ api.overlay.onState((state) => {
   }
 
   els.totalRemaining.textContent = api.calc.formatClock(state.totalRemaining);
-  els.clock.textContent = currentClock();
 
   // One toggle button: pause icon while running, play icon while paused.
   els.btnToggle.textContent = state.paused ? '▶' : '❚❚';
   els.btnToggle.title = state.paused ? 'Resume (Space)' : 'Pause (Space)';
 });
-
-function currentClock() {
-  const d = new Date();
-  const h = d.getHours();
-  const m = String(d.getMinutes()).padStart(2, '0');
-  const ampm = h >= 12 ? 'PM' : 'AM';
-  const hour12 = ((h + 11) % 12) + 1;
-  return `${hour12}:${m} ${ampm}`;
-}
-// Keep the clock ticking even while paused (state ticks stop on pause).
-setInterval(() => { els.clock.textContent = currentClock(); }, 1000);
 
 // ---- Controls -------------------------------------------------------------
 els.btnToggle.addEventListener('click', () => api.control.togglePause());

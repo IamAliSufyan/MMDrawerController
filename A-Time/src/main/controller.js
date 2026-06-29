@@ -99,42 +99,40 @@ class TimerController {
     if (finish) finish();
   }
 
-  _startEngine() {
-    const timer = this.currentTimer;
-    if (!timer) return;
-
-    this.engine = new TimerEngine(timer, { tickMs: 200 });
-
-    const meta = {
-      name: timer.name,
-      totalDuration: timer.sections.reduce((a, s) => a + s.duration, 0),
-      sections: timer.sections.map((s) => ({ name: s.name, color: s.color, duration: s.duration }))
+  /** Build the renderer meta (sections/colors/total) from the current timer. */
+  _buildMeta() {
+    const t = this.currentTimer;
+    return {
+      name: t.name,
+      totalDuration: t.sections.reduce((a, s) => a + s.duration, 0),
+      sections: t.sections.map((s) => ({ name: s.name, color: s.color, duration: s.duration }))
     };
+  }
 
-    // Show the overlay across the configured displays.
-    this.overlay.show(meta, this.getSettings());
+  /** Create a TimerEngine for the current timer with all event side-effects wired. */
+  _createWiredEngine() {
+    const engine = new TimerEngine(this.currentTimer, { tickMs: 200 });
 
-    // Wire engine events -> side effects.
-    this.engine.on('tick', (state) => {
+    engine.on('tick', (state) => {
       this.overlay.updateState(state);
       this.tray.setRemaining(formatClock(state.totalRemaining));
     });
-
-    this.engine.on('statusChange', (state) => {
-      this.overlay.updateState(state);
-    });
-
-    this.engine.on('sectionEnd', ({ index, state }) => {
+    engine.on('statusChange', (state) => this.overlay.updateState(state));
+    engine.on('sectionEnd', ({ index, state }) => {
       // Soft chime when an *intermediate* section ends (the final section's end
-      // is handled by completion below to avoid a double sound).
-      if (index < state.sections.length - 1) {
-        this.sounds.sectionEnd();
-      }
+      // is handled by completion to avoid a double sound).
+      if (index < state.sections.length - 1) this.sounds.sectionEnd();
     });
+    engine.on('complete', (state) => this._onComplete(state));
+    return engine;
+  }
 
-    this.engine.on('complete', (state) => {
-      this._onComplete(state);
-    });
+  _startEngine() {
+    if (!this.currentTimer) return;
+
+    // Show the overlay across the configured displays.
+    this.overlay.show(this._buildMeta(), this.getSettings());
+    this.engine = this._createWiredEngine();
 
     power.preventSleep();
     registerShortcuts({
@@ -146,6 +144,36 @@ class TimerController {
     });
 
     this.engine.start();
+  }
+
+  /**
+   * Apply an edited timer to the live session: rebuild the overlay segments and
+   * engine with the new sections, preserving elapsed time and pause state where
+   * possible. No-op if the edited timer isn't the one currently playing.
+   */
+  updateRunningTimer(updated) {
+    if (!this.currentTimer || !updated || this.currentTimer.id !== updated.id) return;
+
+    const wasRunning = this.engine && this.engine.running;
+    const wasPaused = this.engine && this.engine.paused;
+    const oldElapsed = this.engine ? this.engine.getElapsed() : 0;
+
+    // Keep colors consistent with any new sections.
+    this.currentTimer = { ...updated, sections: assignColors(updated.sections) };
+
+    // If we're still in the countdown (no live engine yet), the new definition
+    // will be picked up when the engine starts.
+    if (!wasRunning) return;
+
+    const meta = this._buildMeta();
+    this.overlay.reinit(meta); // rebuild section segments in place (no flicker)
+
+    this.engine.stop();
+    this.engine.dispose();
+    this.engine = this._createWiredEngine();
+    this.engine.start();
+    this.engine.seek(Math.min(oldElapsed, this.engine.totalDuration));
+    if (wasPaused) this.engine.pause();
   }
 
   _onComplete(state) {

@@ -105,5 +105,21 @@ async function renderSettings() {
   }
 }
 
+// Navigation requested from the menu-bar popover (New / Edit / Settings).
+api.app.onNavigate(async ({ view, timerId } = {}) => {
+  if (view === 'form') {
+    if (timerId) {
+      const timer = await api.timers.get(timerId);
+      renderForm(timer || null);
+    } else {
+      renderForm(null);
+    }
+  } else if (view === 'settings') {
+    renderSettings();
+  } else {
+    renderList();
+  }
+});
+
 // Initial render.
 renderList();

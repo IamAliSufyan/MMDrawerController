@@ -24,6 +24,8 @@ function registerIpc({ controller, overlay }) {
       return { ok: false, errors: result.errors };
     }
     const saved = store.saveTimer(result.timer);
+    // If this timer is currently playing, apply the edits to the live session.
+    controller.updateRunningTimer(saved);
     return { ok: true, timer: saved };
   });
 

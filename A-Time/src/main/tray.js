@@ -33,7 +33,7 @@ function buildTrayImage() {
   return img;
 }
 
-function createTray({ onOpen, onQuit }) {
+function createTray({ onToggle, onOpen, onQuit }) {
   const tray = new Tray(buildTrayImage());
   tray.setToolTip('A-Time');
 
@@ -43,13 +43,15 @@ function createTray({ onOpen, onQuit }) {
     { label: 'Quit A-Time', click: () => onQuit && onQuit() }
   ]);
 
-  // Left-click opens the window; right-click shows the menu. Neither affects a
-  // running timer.
-  tray.on('click', () => onOpen && onOpen());
+  // Left-click toggles the popover beneath the icon; right-click shows the
+  // menu. Neither affects a running timer.
+  tray.on('click', () => onToggle && onToggle(tray.getBounds()));
   tray.on('right-click', () => tray.popUpContextMenu(contextMenu));
 
   return {
     tray,
+    /** Bounds of the tray icon in screen coordinates (for anchoring popups). */
+    getBounds: () => tray.getBounds(),
     /** Show remaining time (e.g. "12:34") beside the icon, or clear it. */
     setRemaining(text) {
       try {

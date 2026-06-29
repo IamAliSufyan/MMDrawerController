@@ -97,6 +97,14 @@ class OverlayManager {
     };
   }
 
+  /** Re-send the timer meta so overlays rebuild their section segments. */
+  reinit(meta) {
+    this.lastTimerMeta = meta;
+    for (const { win } of this.windows) {
+      if (!win.isDestroyed()) win.webContents.send('overlay:init', meta);
+    }
+  }
+
   /** Push a timer state snapshot to every overlay window. */
   updateState(state) {
     for (const { win } of this.windows) {

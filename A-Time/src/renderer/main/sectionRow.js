@@ -26,7 +26,9 @@ export function createSectionRow(data, handlers) {
 
   const row = document.createElement('div');
   row.className = 'section-row';
-  row.draggable = true;
+  // Dragging is enabled only while the left grip is held (see timerForm wireDrag),
+  // so the row's inputs remain fully usable.
+  row.draggable = false;
   row.dataset.id = id;
 
   row.innerHTML = `

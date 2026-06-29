@@ -110,4 +110,36 @@ function createCountdownWindow(display) {
   return win;
 }
 
-module.exports = { createMainWindow, createOverlayWindow, createCountdownWindow };
+/**
+ * The compact menu-bar popover (like a native menu-bar app dropdown). Anchored
+ * just below the menu bar icon; shows the New button + the saved-timer list.
+ */
+function createPopoverWindow() {
+  const win = new BrowserWindow({
+    width: 220,
+    height: 360,
+    show: false,
+    frame: false,
+    transparent: true,
+    hasShadow: true,
+    resizable: false,
+    movable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    minimizable: false,
+    maximizable: false,
+    backgroundColor: '#00000000',
+    webPreferences: baseWebPreferences
+  });
+  win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  win.loadFile(path.join(RENDERER, 'popover', 'popover.html'));
+  return win;
+}
+
+module.exports = {
+  createMainWindow,
+  createOverlayWindow,
+  createCountdownWindow,
+  createPopoverWindow
+};

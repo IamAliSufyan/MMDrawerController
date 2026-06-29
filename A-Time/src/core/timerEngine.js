@@ -210,6 +210,12 @@ class TimerEngine {
     this._lastSectionIndex = this.sectionIndexAt(target);
   }
 
+  /** Public seek: jump to an elapsed time (seconds) and notify listeners. */
+  seek(elapsedSeconds) {
+    this._seek(elapsedSeconds);
+    this._emit('tick', this.getState());
+  }
+
   /** Advance to the start of the next section. */
   nextSection() {
     const index = this.sectionIndexAt(this.getElapsed());

@@ -138,11 +138,19 @@ export function createTimerForm(timer, handlers) {
   totalMinEl.addEventListener('input', updateSummary);
   totalSecEl.addEventListener('input', updateSummary);
 
-  // ---- Drag reorder ----
+  // ---- Drag reorder (only from the left grip, so inputs stay usable) ----
   function wireDrag(rowEl) {
+    const handle = rowEl.querySelector('.drag-handle');
+    rowEl.draggable = false;
+    if (handle) {
+      // The row only becomes draggable while the grip is held.
+      handle.addEventListener('mousedown', () => { rowEl.draggable = true; });
+      handle.addEventListener('mouseup', () => { rowEl.draggable = false; });
+    }
     rowEl.addEventListener('dragstart', () => rowEl.classList.add('dragging'));
     rowEl.addEventListener('dragend', () => {
       rowEl.classList.remove('dragging');
+      rowEl.draggable = false;
       reindex();
       updateSummary();
     });

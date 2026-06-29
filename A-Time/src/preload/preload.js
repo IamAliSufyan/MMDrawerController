@@ -52,6 +52,20 @@ contextBridge.exposeInMainWorld('atime', {
   countdownDone: () => ipcRenderer.send('countdown:done'),
   onCountdownStart: (cb) => on('countdown:start', cb),
 
+  // ---- Menu-bar popover ----
+  popover: {
+    hide: () => ipcRenderer.send('popover:hide'),
+    resize: (height) => ipcRenderer.send('popover:resize', height),
+    onShow: (cb) => on('popover:show', cb)
+  },
+
+  // ---- Main window navigation (from the popover) ----
+  app: {
+    openMain: (opts) => ipcRenderer.send('app:open-main', opts),
+    onNavigate: (cb) => on('app:navigate', cb),
+    quit: () => ipcRenderer.send('app:quit')
+  },
+
   // ---- Overlay ----
   overlay: {
     setIgnoreMouse: (ignore) => ipcRenderer.send('overlay:set-ignore-mouse', ignore),

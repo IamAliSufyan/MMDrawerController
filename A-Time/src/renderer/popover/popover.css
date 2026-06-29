@@ -1,0 +1,118 @@
+/* A-Time menu-bar popover — compact dropdown panel. */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: rgba(248, 248, 250, 0.98);
+  --text: #1c1c1e;
+  --text-muted: #87878c;
+  --border: rgba(0, 0, 0, 0.08);
+  --accent: #4c8bf5;
+  --accent-text: #fff;
+  --control-bg: rgba(0, 0, 0, 0.06);
+  --control-hover: rgba(0, 0, 0, 0.12);
+  --danger: #ff453a;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: rgba(38, 38, 41, 0.98);
+    --text: #f5f5f7;
+    --text-muted: #9a9a9f;
+    --border: rgba(255, 255, 255, 0.1);
+    --control-bg: rgba(255, 255, 255, 0.08);
+    --control-hover: rgba(255, 255, 255, 0.18);
+  }
+}
+
+html, body {
+  background: transparent;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  -webkit-user-select: none;
+  user-select: none;
+  overflow: hidden;
+}
+
+.panel {
+  margin: 8px;
+  background: var(--bg);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 34px rgba(0, 0, 0, 0.32);
+  -webkit-backdrop-filter: blur(24px);
+  backdrop-filter: blur(24px);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.new-btn {
+  width: 100%;
+  border: none;
+  border-radius: 9px;
+  background: var(--accent);
+  color: var(--accent-text);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px;
+  cursor: pointer;
+}
+.new-btn:hover { filter: brightness(1.06); }
+.new-btn .plus { font-weight: 400; margin-right: 4px; }
+
+.list { display: flex; flex-direction: column; gap: 4px; max-height: 380px; overflow-y: auto; }
+
+.pcard {
+  border-radius: 9px;
+  padding: 7px 8px;
+  background: var(--control-bg);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.pcard-name { font-weight: 600; font-size: 12.5px; line-height: 1.2; word-break: break-word; }
+.pcard-meta { color: var(--text-muted); font-size: 10.5px; }
+
+.pcard-actions { display: flex; gap: 4px; }
+.pbtn {
+  flex: 1;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(127, 127, 127, 0.12);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pbtn:hover { background: var(--control-hover); }
+.pbtn-play { background: var(--accent); color: var(--accent-text); }
+.pbtn-play:hover { filter: brightness(1.06); }
+.pbtn-del:hover { background: rgba(255, 69, 58, 0.18); color: var(--danger); }
+
+/* Inline delete confirmation */
+.pcard-confirm { display: flex; align-items: center; gap: 6px; }
+.pcard-confirm span { flex: 1; font-size: 11px; color: var(--danger); }
+.pcard-confirm button { border: none; border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; }
+.confirm-yes { background: var(--danger); color: #fff; }
+.confirm-no { background: var(--control-bg); color: var(--text); }
+
+.empty { color: var(--text-muted); text-align: center; padding: 18px 8px; font-size: 12px; }
+
+.footer { display: flex; gap: 6px; border-top: 0.5px solid var(--border); padding-top: 8px; }
+.footer-btn {
+  flex: 1;
+  border: none;
+  border-radius: 7px;
+  background: var(--control-bg);
+  color: var(--text-muted);
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 6px;
+  cursor: pointer;
+}
+.footer-btn:hover { background: var(--control-hover); color: var(--text); }

@@ -111,8 +111,10 @@ npm start
 ```
 
 The app launches into the **menu bar** (no Dock icon). Click the colorful
-menu bar icon to open the main window. A sample timer — **“Sadiqabad City
-Presentation”** — is seeded on first launch.
+menu bar icon to open a compact **popover** with a *New Timer* button and your
+saved timers (play / edit / duplicate / delete). Editing or creating a timer
+opens the full window. A sample timer — **“Sadiqabad City Presentation”** — is
+seeded on first launch.
 
 ## Test (works on any OS)
 
@@ -181,8 +183,8 @@ xattr -cr "/Applications/A-Time.app"
 Run on a Mac after `npm start` (or after installing the DMG):
 
 - [ ] App appears in the **menu bar** (colorful icon, no Dock icon).
-- [ ] Clicking the menu bar icon opens the main window (and does **not** affect a
-      running timer).
+- [ ] Clicking the menu bar icon opens the compact popover (and does **not**
+      affect a running timer); New/Edit open the full window.
 - [ ] **New Timer** opens the single-page form.
 - [ ] Sections can be added, removed, recolored, and **dragged to reorder**.
 - [ ] Slider and mm:ss field stay in sync (0–15 min per section).

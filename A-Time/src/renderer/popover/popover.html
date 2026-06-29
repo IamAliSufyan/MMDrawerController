@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self';" />
+  <title>A-Time</title>
+  <link rel="stylesheet" href="popover.css" />
+</head>
+<body>
+  <div class="panel">
+    <button id="newBtn" class="new-btn"><span class="plus">+</span> New Timer</button>
+    <div id="list" class="list"></div>
+    <div class="footer">
+      <button id="settingsBtn" class="footer-btn" title="Settings">⚙︎ Settings</button>
+      <button id="quitBtn" class="footer-btn" title="Quit A-Time">Quit</button>
+    </div>
+  </div>
+  <script type="module" src="popover.js"></script>
+</body>
+</html>

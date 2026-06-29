@@ -8,11 +8,11 @@ const { TimerEngine } = require('../src/core/timerEngine');
  * Helper that builds an engine with a controllable clock so we can advance
  * time deterministically without real timers.
  */
-function makeEngine(sections) {
+function makeEngine(sections, opts = {}) {
   let nowMs = 1000;
   const engine = new TimerEngine(
     { sections },
-    { now: () => nowMs, autoStartTicker: false }
+    { now: () => nowMs, autoStartTicker: false, ...opts }
   );
   const advance = (seconds) => { nowMs += seconds * 1000; };
   return { engine, advance };
@@ -103,6 +103,42 @@ test('previousSection restarts current section then steps back', () => {
   engine.previousSection(); // at start of B → go to A
   assert.strictEqual(engine.getState().currentIndex, 0);
   assert.strictEqual(Math.round(engine.getState().elapsed), 0);
+});
+
+test('timeUp fires once at the end (normal mode) then completes', () => {
+  const { engine, advance } = makeEngine(SECTIONS);
+  let timeUps = 0;
+  let completes = 0;
+  engine.on('timeUp', () => timeUps++);
+  engine.on('complete', () => completes++);
+  engine.start();
+  advance(60);
+  engine.tick();
+  advance(5);
+  engine.tick();
+  assert.strictEqual(timeUps, 1);
+  assert.strictEqual(completes, 1);
+});
+
+test('overrun mode keeps counting up past the total without completing', () => {
+  const { engine, advance } = makeEngine(SECTIONS, { overrun: true });
+  let timeUps = 0;
+  let completes = 0;
+  engine.on('timeUp', () => timeUps++);
+  engine.on('complete', () => completes++);
+  engine.start();
+  advance(60);
+  engine.tick();
+  advance(8);
+  engine.tick();
+  const s = engine.getState();
+  assert.strictEqual(timeUps, 1, 'timeUp should fire exactly once');
+  assert.strictEqual(completes, 0, 'overrun must not complete');
+  assert.strictEqual(s.overrun, true);
+  assert.strictEqual(Math.round(s.overBy), 8);
+  assert.strictEqual(s.totalRemaining, 0);
+  assert.strictEqual(engine.running, true);
+  assert.strictEqual(engine.finished, false);
 });
 
 test('reset returns to zero', () => {

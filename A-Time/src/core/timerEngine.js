@@ -48,6 +48,9 @@ class TimerEngine {
     this.now = options.now || (() => Date.now());
     this.tickMs = options.tickMs || 200;
     this.autoStartTicker = options.autoStartTicker !== false;
+    // When enabled, the timer keeps counting *up* past the total instead of
+    // completing, so the presenter sees how far over they are.
+    this.overrunEnabled = options.overrun === true;
 
     this._listeners = {};
     this._interval = null;
@@ -59,6 +62,7 @@ class TimerEngine {
     this.paused = false;
     this.finished = false;
     this._lastSectionIndex = 0;
+    this._timeUpFired = false; // ensures the "time's up" cue fires only once
   }
 
   /** Subscribe to an event. Returns an unsubscribe function. */
@@ -102,7 +106,10 @@ class TimerEngine {
 
   /** Build an immutable snapshot of the current state for views. */
   getState() {
-    const elapsed = Math.min(this.getElapsed(), this.totalDuration);
+    const raw = this.getElapsed();
+    const elapsed = Math.min(raw, this.totalDuration);
+    const overBy = Math.max(0, raw - this.totalDuration); // seconds past the total
+    const overrun = overBy > 0;
     const index = this.sectionIndexAt(elapsed);
     const section = this.sections[index] || { name: '', color: '#cccccc', duration: 0 };
     const sectionElapsed = Math.max(0, elapsed - this.starts[index]);
@@ -113,6 +120,8 @@ class TimerEngine {
       running: this.running,
       paused: this.paused,
       finished: this.finished,
+      overrun,
+      overBy,
       totalDuration: this.totalDuration,
       elapsed,
       totalRemaining,
@@ -150,6 +159,7 @@ class TimerEngine {
     this.paused = false;
     this.finished = false;
     this._lastSectionIndex = 0;
+    this._timeUpFired = false;
     this._startTicker();
     this._emit('statusChange', this.getState());
     this._emit('tick', this.getState());
@@ -189,6 +199,7 @@ class TimerEngine {
     const wasRunning = this.running;
     this.accumulatedElapsed = 0;
     this._lastSectionIndex = 0;
+    this._timeUpFired = false;
     this.finished = false;
     if (wasRunning && !this.paused) {
       this.segmentStart = this.now();
@@ -206,7 +217,10 @@ class TimerEngine {
     if (this.running && !this.paused) {
       this.segmentStart = this.now();
     }
-    this.finished = target >= this.totalDuration;
+    // In overrun mode reaching the total is not a terminal state.
+    this.finished = !this.overrunEnabled && target >= this.totalDuration;
+    // Re-arm the "time's up" cue if we've seeked back before the end.
+    if (target < this.totalDuration) this._timeUpFired = false;
     this._lastSectionIndex = this.sectionIndexAt(target);
   }
 
@@ -218,11 +232,11 @@ class TimerEngine {
 
   /** Advance to the start of the next section. */
   nextSection() {
-    const index = this.sectionIndexAt(this.getElapsed());
+    const index = this.sectionIndexAt(Math.min(this.getElapsed(), this.totalDuration));
     if (index >= this.sections.length - 1) {
-      // Already in last section → jump to completion.
+      // Already in last section → jump to the end (time's up / overrun).
       this._seek(this.totalDuration);
-      this._handleCompletion();
+      this._maybeEnd();
       return;
     }
     const from = index;
@@ -261,14 +275,32 @@ class TimerEngine {
   }
 
   /**
+   * Reaching the end of the timer: fire the final section's end + the one-shot
+   * 'timeUp' cue, then either keep counting up (overrun) or complete.
+   */
+  _maybeEnd() {
+    if (!this._timeUpFired) {
+      this._timeUpFired = true;
+      this._emit('sectionEnd', { index: this.sections.length - 1, state: this.getState() });
+      this._emit('timeUp', this.getState());
+    }
+    if (this.overrunEnabled) {
+      // Keep the engine running so it counts up past the total.
+      this._emit('tick', this.getState());
+    } else {
+      this._handleCompletion();
+    }
+  }
+
+  /**
    * Advance the engine. Normally called by the internal interval, but exposed
    * so tests (and the manual stepping) can drive it deterministically.
    */
   tick() {
     if (!this.running || this.paused || this.finished) return;
 
-    const elapsed = this.getElapsed();
-    const index = this.sectionIndexAt(Math.min(elapsed, this.totalDuration));
+    const raw = this.getElapsed();
+    const index = this.sectionIndexAt(Math.min(raw, this.totalDuration));
 
     // Detect section boundary crossings (there may be several if a section
     // has zero duration or a long pause occurred).
@@ -279,11 +311,8 @@ class TimerEngine {
       this._emit('sectionChange', { from: ended, to: this._lastSectionIndex, state: this.getState() });
     }
 
-    if (elapsed >= this.totalDuration) {
-      // Fire the final section's end, then complete.
-      const lastIndex = this.sections.length - 1;
-      this._emit('sectionEnd', { index: lastIndex, state: this.getState() });
-      this._handleCompletion();
+    if (raw >= this.totalDuration) {
+      this._maybeEnd();
       return;
     }
 

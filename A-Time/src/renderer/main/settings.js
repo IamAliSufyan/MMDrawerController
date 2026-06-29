@@ -53,6 +53,10 @@ export async function createSettingsView() {
         <span>Open PaceBar at login</span>
         <input type="checkbox" id="openAtLogin" />
       </label>
+      <label class="switch-row">
+        <span>Count up after time's up (overrun)<br><small>Keep the overlay showing how far over you are, in red.</small></span>
+        <input type="checkbox" id="overrunMode" />
+      </label>
     </div>
   `;
 
@@ -64,8 +68,10 @@ export async function createSettingsView() {
   const gapVal = el.querySelector('#gapVal');
   const displaySelect = el.querySelector('#displaySelect');
   const openAtLoginEl = el.querySelector('#openAtLogin');
+  const overrunModeEl = el.querySelector('#overrunMode');
 
   openAtLoginEl.checked = !!settings.openAtLogin;
+  overrunModeEl.checked = settings.overrunMode !== false;
 
   // Populate display dropdown.
   for (const d of displays) {
@@ -101,6 +107,9 @@ export async function createSettingsView() {
 
   openAtLoginEl.addEventListener('change', () => {
     save({ openAtLogin: openAtLoginEl.checked });
+  });
+  overrunModeEl.addEventListener('change', () => {
+    save({ overrunMode: overrunModeEl.checked });
   });
 
   el.querySelectorAll('input[name="monitor"]').forEach((r) => {

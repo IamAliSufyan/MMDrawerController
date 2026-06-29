@@ -111,19 +111,28 @@ class TimerController {
 
   /** Create a TimerEngine for the current timer with all event side-effects wired. */
   _createWiredEngine() {
-    const engine = new TimerEngine(this.currentTimer, { tickMs: 200 });
+    const engine = new TimerEngine(this.currentTimer, {
+      tickMs: 200,
+      overrun: !!this.getSettings().overrunMode
+    });
 
     engine.on('tick', (state) => {
       this.overlay.updateState(state);
-      this.tray.setRemaining(formatClock(state.totalRemaining));
+      // Show overrun as +M:SS beside the menu bar icon, otherwise time remaining.
+      this.tray.setRemaining(state.overrun
+        ? '+' + formatClock(state.overBy)
+        : formatClock(state.totalRemaining));
     });
     engine.on('statusChange', (state) => this.overlay.updateState(state));
     engine.on('sectionEnd', ({ index, state }) => {
       // Soft chime when an *intermediate* section ends (the final section's end
-      // is handled by completion to avoid a double sound).
+      // is handled by 'timeUp' to avoid a double sound).
       if (index < state.sections.length - 1) this.sounds.sectionEnd();
     });
-    engine.on('complete', (state) => this._onComplete(state));
+    // Fires once when the total time is reached (in both normal and overrun modes).
+    engine.on('timeUp', () => this._onTimeUp());
+    // Only fires when overrun is disabled (terminal completion).
+    engine.on('complete', () => this._onCompleteTerminal());
     return engine;
   }
 
@@ -176,20 +185,27 @@ class TimerController {
     if (wasPaused) this.engine.pause();
   }
 
-  _onComplete(state) {
+  /** The "time's up" moment: play the final sound + notify (both modes). */
+  _onTimeUp() {
     this.sounds.timerComplete();
     try {
       if (Notification.isSupported()) {
         new Notification({
           title: 'PaceBar',
-          body: `"${this.currentTimer ? this.currentTimer.name : 'Timer'}" has finished.`,
+          body: `"${this.currentTimer ? this.currentTimer.name : 'Timer'}" time is up.`,
           silent: true // we already play our own completion sound
         }).show();
       }
     } catch (err) {
       console.error('[PaceBar] Notification failed:', err);
     }
+  }
 
+  /**
+   * Terminal completion (overrun disabled): hide the overlay and release
+   * resources. In overrun mode this never fires — cleanup happens on stop().
+   */
+  _onCompleteTerminal() {
     // Give the overlay a beat to show 100%, then hide.
     setTimeout(() => this.overlay.hide(), 1200);
     this.tray.setRemaining('');

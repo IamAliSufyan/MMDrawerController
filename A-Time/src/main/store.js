@@ -23,7 +23,8 @@ const DEFAULT_SETTINGS = {
   overlayLeft: null, // px from the display's left edge
   overlayTop: null, // px from the display's top edge
   overlayWidth: null, // px width; null = full screen width
-  openAtLogin: false // launch PaceBar automatically when the user logs in
+  openAtLogin: false, // launch PaceBar automatically when the user logs in
+  overrunMode: true // keep counting up (in red) after the total time is reached
 };
 
 const STORE_FILE = 'a-time-data.json';

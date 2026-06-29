@@ -36,6 +36,10 @@ into a signed-or-unsigned **DMG**.
 - 🖱️ **Click-through** — the whole overlay passes clicks through to the apps
   underneath; only the small **Pause / Resume / Stop / Reset** controls on the
   right are interactive.
+- 🟧🟥 **Time warnings + overrun** — the active section turns **amber** as it
+  nears its end and **flashes red** in the final seconds. When the total time is
+  up, PaceBar keeps counting **up in red** (`+M:SS`) so you can see how far over
+  you are (toggle in Settings).
 - ⌨️ **Global shortcuts** — `Space` pause/resume, `⌘R` restart, `⌘→` next
   section, `⌘←` previous section, `Esc` stop.
 - 🔋 **Sleep prevention** while running (released on pause/stop/complete).

@@ -15,6 +15,10 @@ const root = document.documentElement;
 const bar = document.getElementById('bar');
 const track = document.getElementById('track');
 
+// Time-warning thresholds (seconds): amber under WARN, red flash under DANGER.
+const WARN_SECONDS = 15;
+const DANGER_SECONDS = 5;
+
 const els = {
   totalRemaining: document.getElementById('totalRemaining'),
   btnToggle: document.getElementById('btnToggle'),
@@ -82,19 +86,40 @@ api.overlay.onState((state) => {
     const seg = segments[i];
     let pct = 0;
     let remaining = seg.duration; // upcoming sections show their full length
+    let warn = false;
+    let danger = false;
     if (i < state.currentIndex) { pct = 100; remaining = 0; }        // done
     else if (i === state.currentIndex) {                              // active
       pct = seg.duration > 0 ? Math.min(100, (state.sectionElapsed / seg.duration) * 100) : 100;
       remaining = state.sectionRemaining;
+      // Warn as the active section nears its end (overrun handled separately).
+      if (!state.overrun) {
+        danger = remaining <= DANGER_SECONDS;
+        warn = !danger && remaining <= WARN_SECONDS;
+      }
     }
     seg.fill.style.width = `${pct}%`;
     seg.timeEl.textContent = api.calc.formatClock(remaining);
     seg.el.classList.toggle('is-done', i < state.currentIndex);
+    seg.el.classList.toggle('warn', warn);
+    seg.el.classList.toggle('danger', danger);
     const name = state.sections[i].name || '';
     if (seg.nameEl.textContent !== name) seg.nameEl.textContent = name;
   }
 
-  els.totalRemaining.textContent = api.calc.formatClock(state.totalRemaining);
+  // Total readout: overrun counts up in red; otherwise warn/danger as it nears 0.
+  if (state.overrun) {
+    els.totalRemaining.textContent = '+' + api.calc.formatClock(state.overBy);
+  } else {
+    els.totalRemaining.textContent = api.calc.formatClock(state.totalRemaining);
+  }
+  els.totalRemaining.classList.toggle('overrun', state.overrun);
+  els.totalRemaining.classList.toggle('danger', !state.overrun && state.totalRemaining <= DANGER_SECONDS);
+  els.totalRemaining.classList.toggle('warn',
+    !state.overrun && state.totalRemaining > DANGER_SECONDS && state.totalRemaining <= WARN_SECONDS);
+
+  // The whole bar pulses red while overrunning.
+  bar.classList.toggle('overrun', state.overrun);
 
   // One toggle button: pause icon while running, play icon while paused.
   els.btnToggle.textContent = state.paused ? '▶' : '❚❚';

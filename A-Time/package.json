@@ -1,8 +1,8 @@
 {
   "name": "a-time",
-  "productName": "A-Time",
+  "productName": "A-Timer",
   "version": "1.0.0",
-  "description": "A-Time — a macOS menu bar presentation timer with a click-through overlay progress bar.",
+  "description": "A-Timer — a macOS menu bar presentation timer with a click-through overlay progress bar.",
   "author": {
     "name": "A-Time"
   },

@@ -1,5 +1,8 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
+const { app } = require('electron');
 const Store = require('electron-store');
 const { assignColors } = require('../core/palette');
 
@@ -19,8 +22,32 @@ const DEFAULT_SETTINGS = {
   // menu bar, full screen width). These are set when the user drags/resizes.
   overlayLeft: null, // px from the display's left edge
   overlayTop: null, // px from the display's top edge
-  overlayWidth: null // px width; null = full screen width
+  overlayWidth: null, // px width; null = full screen width
+  openAtLogin: false // launch A-Timer automatically when the user logs in
 };
+
+const STORE_FILE = 'a-time-data.json';
+
+/**
+ * Migrate data from the previous app name ("A-Time") to the new one
+ * ("A-Timer") so renaming the app doesn't lose the user's saved timers.
+ * Runs once, before the store is opened.
+ */
+function migrateLegacyData() {
+  try {
+    const newPath = path.join(app.getPath('userData'), STORE_FILE);
+    if (fs.existsSync(newPath)) return; // already migrated / has data
+    const oldPath = path.join(app.getPath('appData'), 'A-Time', STORE_FILE);
+    if (fs.existsSync(oldPath)) {
+      fs.mkdirSync(app.getPath('userData'), { recursive: true });
+      fs.copyFileSync(oldPath, newPath);
+    }
+  } catch (err) {
+    console.error('[A-Timer] Legacy data migration failed:', err);
+  }
+}
+
+migrateLegacyData();
 
 /**
  * The required sample timer. Sections add up to 18 minutes while a user would

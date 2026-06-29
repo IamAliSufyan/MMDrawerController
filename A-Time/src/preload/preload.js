@@ -52,6 +52,11 @@ contextBridge.exposeInMainWorld('atime', {
   countdownDone: () => ipcRenderer.send('countdown:done'),
   onCountdownStart: (cb) => on('countdown:start', cb),
 
+  // ---- Splash ----
+  splash: {
+    onLogo: (cb) => on('splash:logo', cb)
+  },
+
   // ---- Menu-bar popover ----
   popover: {
     hide: () => ipcRenderer.send('popover:hide'),

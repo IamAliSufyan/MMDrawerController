@@ -23,9 +23,14 @@ function createMainWindow() {
     minWidth: 560,
     minHeight: 480,
     show: false,
-    title: 'A-Time',
+    title: 'A-Timer',
     titleBarStyle: 'hiddenInset',
-    backgroundColor: '#1c1c1e',
+    // Liquid-glass: translucent vibrancy material behind the UI. The window
+    // keeps its frame/traffic lights; the CSS uses translucent surfaces so the
+    // material shows through.
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
+    backgroundColor: '#00000000',
     webPreferences: baseWebPreferences
   });
 
@@ -130,6 +135,8 @@ function createPopoverWindow() {
     minimizable: false,
     maximizable: false,
     backgroundColor: '#00000000',
+    // Glass look comes from the CSS backdrop-filter on the panel (combining a
+    // transparent window with native vibrancy is unreliable on macOS).
     webPreferences: baseWebPreferences
   });
   win.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
@@ -137,9 +144,35 @@ function createPopoverWindow() {
   return win;
 }
 
+/**
+ * A small, centered splash window shown briefly on launch with the app logo,
+ * so opening the app feels branded instead of flashing a blank window.
+ */
+function createSplashWindow() {
+  const win = new BrowserWindow({
+    width: 300,
+    height: 340,
+    show: false,
+    frame: false,
+    transparent: true,
+    hasShadow: false,
+    resizable: false,
+    movable: false,
+    center: true,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    fullscreenable: false,
+    backgroundColor: '#00000000',
+    webPreferences: baseWebPreferences
+  });
+  win.loadFile(path.join(RENDERER, 'splash', 'splash.html'));
+  return win;
+}
+
 module.exports = {
   createMainWindow,
   createOverlayWindow,
   createCountdownWindow,
-  createPopoverWindow
+  createPopoverWindow,
+  createSplashWindow
 };

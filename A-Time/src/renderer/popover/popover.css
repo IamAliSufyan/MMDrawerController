@@ -2,7 +2,7 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 :root {
-  --bg: rgba(248, 248, 250, 0.98);
+  --bg: rgba(255, 255, 255, 0.55);
   --text: #1c1c1e;
   --text-muted: #87878c;
   --border: rgba(0, 0, 0, 0.08);
@@ -15,7 +15,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: rgba(38, 38, 41, 0.98);
+    --bg: rgba(40, 40, 43, 0.5);
     --text: #f5f5f7;
     --text-muted: #9a9a9f;
     --border: rgba(255, 255, 255, 0.1);
@@ -40,8 +40,8 @@ html, body {
   border: 0.5px solid var(--border);
   border-radius: 12px;
   box-shadow: 0 10px 34px rgba(0, 0, 0, 0.32);
-  -webkit-backdrop-filter: blur(24px);
-  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(30px) saturate(170%);
+  backdrop-filter: blur(30px) saturate(170%);
   padding: 8px;
   display: flex;
   flex-direction: column;

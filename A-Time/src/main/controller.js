@@ -181,7 +181,7 @@ class TimerController {
     try {
       if (Notification.isSupported()) {
         new Notification({
-          title: 'A-Time',
+          title: 'A-Timer',
           body: `"${this.currentTimer ? this.currentTimer.name : 'Timer'}" has finished.`,
           silent: true // we already play our own completion sound
         }).show();

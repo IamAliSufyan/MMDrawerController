@@ -3,8 +3,9 @@
 const { app, BrowserWindow, nativeTheme, ipcMain, screen } = require('electron');
 
 const store = require('./store');
-const { createMainWindow, createPopoverWindow } = require('./windows');
+const { createMainWindow, createPopoverWindow, createSplashWindow } = require('./windows');
 const { createTray } = require('./tray');
+const iconGen = require('../../scripts/iconGen');
 const { OverlayManager } = require('./overlayManager');
 const { TimerController } = require('./controller');
 const { createSoundPlayer } = require('./sounds');
@@ -33,6 +34,23 @@ function showMainWindow() {
   }
   mainWindow.show();
   mainWindow.focus();
+}
+
+/** Show the branded splash with the app logo for a brief moment on launch. */
+function showSplash() {
+  try {
+    const splash = createSplashWindow();
+    splash.once('ready-to-show', () => { if (!splash.isDestroyed()) splash.show(); });
+    splash.webContents.once('did-finish-load', () => {
+      if (splash.isDestroyed()) return;
+      const dataUrl = 'data:image/png;base64,' + iconGen.appIconPNG(256).toString('base64');
+      splash.webContents.send('splash:logo', dataUrl);
+      splash.show();
+    });
+    setTimeout(() => { if (!splash.isDestroyed()) splash.close(); }, 1400);
+  } catch (err) {
+    console.error('[A-Timer] Splash failed:', err);
+  }
 }
 
 /** Open the main window and navigate it to a view (list / form / settings). */
@@ -75,6 +93,8 @@ function init() {
   }
 
   store.seedIfNeeded();
+
+  showSplash();
 
   mainWindow = createMainWindow();
   overlay = new OverlayManager();

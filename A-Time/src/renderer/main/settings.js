@@ -46,6 +46,14 @@ export async function createSettingsView() {
         <select id="displaySelect" class="field-input small"></select>
       </label>
     </div>
+
+    <div class="settings-group">
+      <span class="settings-group-title">General</span>
+      <label class="switch-row">
+        <span>Open A-Timer at login</span>
+        <input type="checkbox" id="openAtLogin" />
+      </label>
+    </div>
   `;
 
   const heightEl = el.querySelector('#setHeight');
@@ -55,6 +63,9 @@ export async function createSettingsView() {
   const opacityVal = el.querySelector('#opacityVal');
   const gapVal = el.querySelector('#gapVal');
   const displaySelect = el.querySelector('#displaySelect');
+  const openAtLoginEl = el.querySelector('#openAtLogin');
+
+  openAtLoginEl.checked = !!settings.openAtLogin;
 
   // Populate display dropdown.
   for (const d of displays) {
@@ -86,6 +97,10 @@ export async function createSettingsView() {
   gapEl.addEventListener('input', () => {
     gapVal.textContent = `${gapEl.value}px`;
     save({ overlayGap: Number(gapEl.value) });
+  });
+
+  openAtLoginEl.addEventListener('change', () => {
+    save({ openAtLogin: openAtLoginEl.checked });
   });
 
   el.querySelectorAll('input[name="monitor"]').forEach((r) => {

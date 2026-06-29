@@ -1,6 +1,6 @@
 'use strict';
 
-const { ipcMain, screen } = require('electron');
+const { ipcMain, screen, app } = require('electron');
 const store = require('./store');
 const { validateTimer } = require('../core/validation');
 
@@ -42,10 +42,23 @@ function registerIpc({ controller, overlay }) {
   });
 
   // ---- Settings -----------------------------------------------------------
-  ipcMain.handle('settings:get', () => store.getSettings());
+  ipcMain.handle('settings:get', () => {
+    const settings = store.getSettings();
+    // The OS is the source of truth for the login item.
+    try { settings.openAtLogin = app.getLoginItemSettings().openAtLogin; } catch (_) { /* non-mac/dev */ }
+    return settings;
+  });
 
   ipcMain.handle('settings:save', (_e, partial) => {
     const merged = store.saveSettings(partial);
+    // Apply the "open at login" preference to the OS when it changes.
+    if (partial && Object.prototype.hasOwnProperty.call(partial, 'openAtLogin')) {
+      try {
+        app.setLoginItemSettings({ openAtLogin: !!partial.openAtLogin, openAsHidden: true });
+      } catch (err) {
+        console.error('[A-Timer] setLoginItemSettings failed:', err);
+      }
+    }
     controller.applySettings();
     return merged;
   });

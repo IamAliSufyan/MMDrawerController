@@ -1,33 +1,41 @@
 /* A-Time main window — clean modern macOS-style UI with light/dark support. */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
+/*
+ * Liquid-glass theme. The window uses a native vibrancy material (set in
+ * windows.js), so surfaces here are translucent with a backdrop blur and a
+ * subtle light edge to read like frosted glass over the material.
+ */
 :root {
-  --bg: #f5f5f7;
-  --bg-elev: #ffffff;
+  --bg: transparent;
+  --bg-elev: rgba(255, 255, 255, 0.55);
+  --glass-blur: blur(30px) saturate(170%);
+  --glass-edge: 0.5px solid rgba(255, 255, 255, 0.5);
   --text: #1c1c1e;
-  --text-muted: #8a8a8e;
+  --text-muted: #6e6e73;
   --border: rgba(0, 0, 0, 0.08);
   --accent: #4c8bf5;
   --accent-text: #ffffff;
   --danger: #ff453a;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 6px 20px rgba(0, 0, 0, 0.06);
-  --radius: 12px;
-  --control-bg: rgba(0, 0, 0, 0.05);
-  --control-hover: rgba(0, 0, 0, 0.1);
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.10), 0 8px 26px rgba(0, 0, 0, 0.10);
+  --radius: 14px;
+  --control-bg: rgba(120, 120, 128, 0.16);
+  --control-hover: rgba(120, 120, 128, 0.28);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #1c1c1e;
-    --bg-elev: #2c2c2e;
+    --bg: transparent;
+    --bg-elev: rgba(60, 60, 64, 0.45);
+    --glass-edge: 0.5px solid rgba(255, 255, 255, 0.14);
     --text: #f5f5f7;
-    --text-muted: #98989d;
-    --border: rgba(255, 255, 255, 0.1);
+    --text-muted: #aeaeb2;
+    --border: rgba(255, 255, 255, 0.12);
     --accent: #4c8bf5;
     --danger: #ff453a;
-    --shadow: 0 1px 3px rgba(0, 0, 0, 0.4), 0 6px 20px rgba(0, 0, 0, 0.3);
-    --control-bg: rgba(255, 255, 255, 0.08);
-    --control-hover: rgba(255, 255, 255, 0.16);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 8px 26px rgba(0, 0, 0, 0.4);
+    --control-bg: rgba(120, 120, 128, 0.32);
+    --control-hover: rgba(120, 120, 128, 0.5);
   }
 }
 
@@ -51,7 +59,12 @@ html, body {
   justify-content: space-between;
   padding: 0 18px 0 86px; /* leave room for the macOS traffic lights */
   border-bottom: 1px solid var(--border);
-  background: var(--bg-elev);
+  background: rgba(255, 255, 255, 0.18);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+}
+@media (prefers-color-scheme: dark) {
+  .app-header { background: rgba(40, 40, 43, 0.28); }
 }
 
 .app-brand { font-weight: 700; font-size: 15px; letter-spacing: -0.2px; }
@@ -293,3 +306,36 @@ html, body {
 .radio-row { display: flex; align-items: center; gap: 8px; padding: 7px 0; font-size: 13px; }
 .radio-row input[type="radio"] { accent-color: var(--accent); }
 .radio-row select { margin-left: 8px; }
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
+  font-size: 13px;
+}
+.switch-row input[type="checkbox"] { width: 38px; height: 22px; accent-color: var(--accent); cursor: pointer; }
+
+/* ---- Liquid-glass surfaces ---- */
+.timer-card,
+.sections-block,
+.settings-group,
+.modal,
+.field-input,
+.sec-name,
+.sec-min,
+.sec-sec {
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  border: var(--glass-edge);
+}
+.section-row {
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  backdrop-filter: blur(12px) saturate(140%);
+}
+.modal-backdrop {
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.btn-new, .timer-card { box-shadow: var(--shadow); }

@@ -1,6 +1,6 @@
-# A-Time
+# A-Timer
 
-**A-Time** is a macOS **menu bar presentation timer**. It lives in the menu bar
+**A-Timer** is a macOS **menu bar presentation timer**. It lives in the menu bar
 and shows a **full-width, click-through overlay progress bar** pinned just below
 the macOS menu bar. The bar is split into the sections of your talk and fills
 section-by-section as you present — staying above every app while never stealing

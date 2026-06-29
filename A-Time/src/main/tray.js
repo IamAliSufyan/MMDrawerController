@@ -35,12 +35,12 @@ function buildTrayImage() {
 
 function createTray({ onToggle, onOpen, onQuit }) {
   const tray = new Tray(buildTrayImage());
-  tray.setToolTip('A-Time');
+  tray.setToolTip('A-Timer');
 
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Open A-Time', click: () => onOpen && onOpen() },
+    { label: 'Open A-Timer', click: () => onOpen && onOpen() },
     { type: 'separator' },
-    { label: 'Quit A-Time', click: () => onQuit && onQuit() }
+    { label: 'Quit A-Timer', click: () => onQuit && onQuit() }
   ]);
 
   // Left-click toggles the popover beneath the icon; right-click shows the

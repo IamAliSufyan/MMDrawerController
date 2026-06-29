@@ -112,12 +112,15 @@ els.btnMenu.addEventListener('click', () => toggleMenu());
 // pointer is over an `.interactive` element (grips, controls, popup), or while
 // a drag/resize gesture is in progress.
 let clicksEnabled = null;
+let menuOpen = false;
 function enableClicks() { if (clicksEnabled !== true) { clicksEnabled = true; api.overlay.setIgnoreMouse(false); } }
 function disableClicks() { if (clicksEnabled !== false) { clicksEnabled = false; api.overlay.setIgnoreMouse(true); } }
 disableClicks();
 
 function updateInteractivity(x, y) {
-  if (dragging || resizing) { enableClicks(); return; }
+  // While the settings menu is open, capture the whole window so a click
+  // anywhere can dismiss it.
+  if (menuOpen || dragging || resizing) { enableClicks(); return; }
   const el = document.elementFromPoint(x, y);
   if (el && el.closest('.interactive')) enableClicks();
   else disableClicks();
@@ -197,11 +200,32 @@ const MONITOR_ORDER = ['main', 'all', 'specific'];
 const MONITOR_LABELS = { main: 'Main screen', all: 'All screens', specific: 'Specific' };
 let menuState = { behavior: 'main', displays: [], specificId: null };
 
-async function toggleMenu() {
-  if (!els.menuPopup.hidden) { els.menuPopup.hidden = true; return; }
+async function openMenu() {
   await populateMenu();
+  menuOpen = true;
   els.menuPopup.hidden = false;
+  enableClicks();
 }
+
+function closeMenu() {
+  if (!menuOpen) return;
+  menuOpen = false;
+  els.menuPopup.hidden = true;
+  disableClicks(); // next pointer move restores hover-based hit-testing
+}
+
+function toggleMenu() {
+  if (menuOpen) closeMenu();
+  else openMenu();
+}
+
+// Dismiss the menu when clicking anywhere outside it (but not on the ⋯ button,
+// which toggles it).
+document.addEventListener('mousedown', (e) => {
+  if (!menuOpen) return;
+  if (e.target.closest('#menuPopup') || e.target.closest('#btnMenu')) return;
+  closeMenu();
+});
 
 async function populateMenu() {
   const s = await api.settings.get();

@@ -172,15 +172,21 @@ function drawHand(cv, cx, cy, angle, length, width, color) {
 function drawAppIcon(size) {
   const cv = makeCanvas(size);
   drawRoundedGradient(cv, '#2B3A67', '#5B2C83', Math.round(size * 0.22));
-  const cx = size / 2;
-  const cy = size / 2;
-  // White backing disc for contrast.
-  drawRing(cv, cx, cy, size * 0.36, 0, ['#ffffff'], -Math.PI / 2);
-  // Colorful segmented ring.
-  drawRing(cv, cx, cy, size * 0.36, size * 0.26, DEFAULT_PALETTE);
-  // Clock hands.
-  drawHand(cv, cx, cy, -Math.PI / 2, size * 0.20, Math.max(1, size * 0.012), '#2B3A67');
-  drawHand(cv, cx, cy, 0, size * 0.14, Math.max(1, size * 0.012), '#2B3A67');
+
+  // A segmented progress bar (matches the menu bar icon + overlay).
+  const n = 4;
+  const colors = DEFAULT_PALETTE.slice(0, n);
+  const barW = Math.round(size * 0.62);
+  const barH = Math.round(size * 0.22);
+  const x = Math.round((size - barW) / 2);
+  const y = Math.round((size - barH) / 2);
+  const radius = Math.round(barH * 0.34);
+  const gap = Math.max(1, Math.round(size * 0.02));
+
+  // Soft white backing plate for contrast over the gradient.
+  const pad = Math.round(size * 0.045);
+  fillRoundedRect(cv, x - pad, y - pad, barW + 2 * pad, barH + 2 * pad, radius + pad, [255, 255, 255], 64);
+  drawSegmentedBar(cv, x, y, barW, barH, colors, gap, radius);
   return cv;
 }
 
@@ -199,28 +205,26 @@ function roundedRectAlpha(px, py, x, y, w, h, r) {
   return 1;
 }
 
-/**
- * The tray icon: a horizontal progress bar split into several colored sections
- * (mirrors the overlay), so it reads clearly in the menu bar.
- */
-function drawTrayIcon(size) {
-  const cv = makeCanvas(size);
-  const n = 4; // number of sections
-  const colors = DEFAULT_PALETTE.slice(0, n);
+/** Fill a rounded rectangle with a solid color at a given alpha (0..255). */
+function fillRoundedRect(cv, x, y, w, h, radius, color, alpha) {
+  const [r, g, b] = color;
+  for (let py = Math.floor(y - 1); py <= Math.ceil(y + h + 1); py++) {
+    for (let px = Math.floor(x - 1); px <= Math.ceil(x + w + 1); px++) {
+      const a = roundedRectAlpha(px + 0.5, py + 0.5, x, y, w, h, radius);
+      if (a > 0) setPixel(cv, px, py, r, g, b, Math.round(a * alpha));
+    }
+  }
+}
 
-  const barW = size - 2;
-  const barH = Math.round(size * 0.5);
-  const barX = 1;
-  const barY = Math.round((size - barH) / 2);
-  const radius = Math.max(2, Math.round(barH * 0.32));
-  const gap = Math.max(1, Math.round(size * 0.045)); // separation between sections
-  const segW = barW / n;
-
-  for (let py = barY - 1; py <= barY + barH + 1; py++) {
-    for (let px = barX - 1; px <= barX + barW + 1; px++) {
-      const a = roundedRectAlpha(px + 0.5, py + 0.5, barX, barY, barW, barH, radius);
+/** Draw a horizontal progress bar split into colored sections (rounded, gapped). */
+function drawSegmentedBar(cv, x, y, w, h, colors, gap, radius) {
+  const n = colors.length;
+  const segW = w / n;
+  for (let py = Math.floor(y - 1); py <= Math.ceil(y + h + 1); py++) {
+    for (let px = Math.floor(x - 1); px <= Math.ceil(x + w + 1); px++) {
+      const a = roundedRectAlpha(px + 0.5, py + 0.5, x, y, w, h, radius);
       if (a <= 0) continue;
-      const local = px - barX;
+      const local = px - x;
       let seg = Math.floor(local / segW);
       if (seg < 0) seg = 0;
       if (seg > n - 1) seg = n - 1;
@@ -230,6 +234,20 @@ function drawTrayIcon(size) {
       setPixel(cv, px, py, r, g, b, Math.round(a * 255));
     }
   }
+}
+
+/**
+ * The tray icon: a horizontal progress bar split into several colored sections
+ * (mirrors the overlay), so it reads clearly in the menu bar.
+ */
+function drawTrayIcon(size) {
+  const cv = makeCanvas(size);
+  const colors = DEFAULT_PALETTE.slice(0, 4);
+  const barW = size - 2;
+  const barH = Math.round(size * 0.5);
+  const radius = Math.max(2, Math.round(barH * 0.32));
+  const gap = Math.max(1, Math.round(size * 0.045));
+  drawSegmentedBar(cv, 1, Math.round((size - barH) / 2), barW, barH, colors, gap, radius);
   return cv;
 }
 

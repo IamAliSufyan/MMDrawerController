@@ -16,7 +16,7 @@ function preventSleep() {
       blockerId = powerSaveBlocker.start('prevent-display-sleep');
     }
   } catch (err) {
-    console.error('[A-Time] Failed to start power save blocker:', err);
+    console.error('[PaceBar] Failed to start power save blocker:', err);
   }
 }
 
@@ -26,7 +26,7 @@ function allowSleep() {
       powerSaveBlocker.stop(blockerId);
     }
   } catch (err) {
-    console.error('[A-Time] Failed to stop power save blocker:', err);
+    console.error('[PaceBar] Failed to stop power save blocker:', err);
   } finally {
     blockerId = null;
   }

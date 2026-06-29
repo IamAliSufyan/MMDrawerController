@@ -56,7 +56,7 @@ function registerIpc({ controller, overlay }) {
       try {
         app.setLoginItemSettings({ openAtLogin: !!partial.openAtLogin, openAsHidden: true });
       } catch (err) {
-        console.error('[A-Timer] setLoginItemSettings failed:', err);
+        console.error('[PaceBar] setLoginItemSettings failed:', err);
       }
     }
     controller.applySettings();

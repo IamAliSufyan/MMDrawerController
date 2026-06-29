@@ -50,7 +50,7 @@ export async function createSettingsView() {
     <div class="settings-group">
       <span class="settings-group-title">General</span>
       <label class="switch-row">
-        <span>Open A-Timer at login</span>
+        <span>Open PaceBar at login</span>
         <input type="checkbox" id="openAtLogin" />
       </label>
     </div>

@@ -181,13 +181,13 @@ class TimerController {
     try {
       if (Notification.isSupported()) {
         new Notification({
-          title: 'A-Timer',
+          title: 'PaceBar',
           body: `"${this.currentTimer ? this.currentTimer.name : 'Timer'}" has finished.`,
           silent: true // we already play our own completion sound
         }).show();
       }
     } catch (err) {
-      console.error('[A-Time] Notification failed:', err);
+      console.error('[PaceBar] Notification failed:', err);
     }
 
     // Give the overlay a beat to show 100%, then hide.

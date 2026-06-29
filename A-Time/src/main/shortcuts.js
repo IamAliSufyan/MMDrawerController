@@ -26,9 +26,9 @@ function registerShortcuts(handlers) {
     if (typeof fn !== 'function') continue;
     try {
       const ok = globalShortcut.register(accelerator, fn);
-      if (!ok) console.warn(`[A-Time] Could not register shortcut: ${accelerator}`);
+      if (!ok) console.warn(`[PaceBar] Could not register shortcut: ${accelerator}`);
     } catch (err) {
-      console.error(`[A-Time] Error registering ${accelerator}:`, err);
+      console.error(`[PaceBar] Error registering ${accelerator}:`, err);
     }
   }
 }
@@ -37,7 +37,7 @@ function unregisterShortcuts() {
   try {
     globalShortcut.unregisterAll();
   } catch (err) {
-    console.error('[A-Time] Error unregistering shortcuts:', err);
+    console.error('[PaceBar] Error unregistering shortcuts:', err);
   }
 }
 

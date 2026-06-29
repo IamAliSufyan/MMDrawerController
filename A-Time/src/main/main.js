@@ -49,7 +49,7 @@ function showSplash() {
     });
     setTimeout(() => { if (!splash.isDestroyed()) splash.close(); }, 1400);
   } catch (err) {
-    console.error('[A-Timer] Splash failed:', err);
+    console.error('[PaceBar] Splash failed:', err);
   }
 }
 
@@ -159,7 +159,7 @@ function quitApp() {
     // Allow the main window to actually close.
     BrowserWindow.getAllWindows().forEach((w) => { w._forceClose = true; });
   } catch (err) {
-    console.error('[A-Time] Error during quit:', err);
+    console.error('[PaceBar] Error during quit:', err);
   }
   app.quit();
 }

@@ -1,6 +1,6 @@
-# A-Timer
+# PaceBar
 
-**A-Timer** is a macOS **menu bar presentation timer**. It lives in the menu bar
+**PaceBar** is a macOS **menu bar presentation timer**. It lives in the menu bar
 and shows a **full-width, click-through overlay progress bar** pinned just below
 the macOS menu bar. The bar is split into the sections of your talk and fills
 section-by-section as you present — staying above every app while never stealing
@@ -161,7 +161,7 @@ npm run build
 To run an **unsigned** local build, right-click the app → *Open*, or:
 
 ```bash
-xattr -cr "/Applications/A-Time.app"
+xattr -cr "/Applications/PaceBar.app"
 ```
 
 ---

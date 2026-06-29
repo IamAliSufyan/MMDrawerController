@@ -23,27 +23,33 @@ const DEFAULT_SETTINGS = {
   overlayLeft: null, // px from the display's left edge
   overlayTop: null, // px from the display's top edge
   overlayWidth: null, // px width; null = full screen width
-  openAtLogin: false // launch A-Timer automatically when the user logs in
+  openAtLogin: false // launch PaceBar automatically when the user logs in
 };
 
 const STORE_FILE = 'a-time-data.json';
 
+// Previous app names, newest first, to migrate saved data from when renaming.
+const LEGACY_APP_NAMES = ['A-Timer', 'A-Time'];
+
 /**
- * Migrate data from the previous app name ("A-Time") to the new one
- * ("A-Timer") so renaming the app doesn't lose the user's saved timers.
+ * Migrate data from a previous app name (e.g. "A-Timer", "A-Time") to the
+ * current one ("PaceBar") so renaming the app doesn't lose saved timers.
  * Runs once, before the store is opened.
  */
 function migrateLegacyData() {
   try {
     const newPath = path.join(app.getPath('userData'), STORE_FILE);
     if (fs.existsSync(newPath)) return; // already migrated / has data
-    const oldPath = path.join(app.getPath('appData'), 'A-Time', STORE_FILE);
-    if (fs.existsSync(oldPath)) {
-      fs.mkdirSync(app.getPath('userData'), { recursive: true });
-      fs.copyFileSync(oldPath, newPath);
+    for (const name of LEGACY_APP_NAMES) {
+      const oldPath = path.join(app.getPath('appData'), name, STORE_FILE);
+      if (fs.existsSync(oldPath)) {
+        fs.mkdirSync(app.getPath('userData'), { recursive: true });
+        fs.copyFileSync(oldPath, newPath);
+        return;
+      }
     }
   } catch (err) {
-    console.error('[A-Timer] Legacy data migration failed:', err);
+    console.error('[PaceBar] Legacy data migration failed:', err);
   }
 }
 

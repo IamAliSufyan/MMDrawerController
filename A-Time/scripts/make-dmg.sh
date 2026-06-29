@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Builds the A-Time macOS DMG installer.
+# Builds the PaceBar macOS DMG installer.
 #
 # Usage:  npm run dmg     (or)   bash scripts/make-dmg.sh
 #
@@ -16,7 +16,7 @@ PROJECT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 cd "${PROJECT_DIR}"
 
 if [[ "$(uname)" != "Darwin" ]]; then
-  echo "Error: A-Time DMGs can only be built on macOS." >&2
+  echo "Error: PaceBar DMGs can only be built on macOS." >&2
   exit 1
 fi
 

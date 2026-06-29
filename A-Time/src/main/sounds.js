@@ -19,7 +19,7 @@ function createSoundPlayer(getOverlayWebContents) {
         wc.send('sound:play', kind);
       }
     } catch (err) {
-      console.error('[A-Time] Failed to play sound:', err);
+      console.error('[PaceBar] Failed to play sound:', err);
     }
   }
   return {

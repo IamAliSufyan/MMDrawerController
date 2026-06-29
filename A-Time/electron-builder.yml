@@ -1,6 +1,6 @@
 appId: com.atime.app
-productName: A-Timer
-copyright: Copyright © 2026 A-Timer
+productName: PaceBar
+copyright: Copyright © 2026 PaceBar
 
 directories:
   output: dist
@@ -32,10 +32,10 @@ mac:
   # This app lives in the menu bar only (LSUIElement hides it from the Dock).
   extendInfo:
     LSUIElement: 1
-    NSAppleEventsUsageDescription: A-Timer uses system events to display the timer overlay.
+    NSAppleEventsUsageDescription: PaceBar uses system events to display the timer overlay.
 
 dmg:
-  title: A-Timer ${version}
+  title: PaceBar ${version}
   icon: build/icon.icns
   contents:
     - x: 130

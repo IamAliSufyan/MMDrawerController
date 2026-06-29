@@ -1,8 +1,8 @@
 {
   "name": "a-time",
-  "productName": "A-Timer",
+  "productName": "PaceBar",
   "version": "1.0.0",
-  "description": "A-Timer — a macOS menu bar presentation timer with a click-through overlay progress bar.",
+  "description": "PaceBar — a macOS menu bar presentation timer with a click-through overlay progress bar.",
   "author": {
     "name": "A-Time"
   },

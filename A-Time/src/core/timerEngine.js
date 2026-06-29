@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * TimerEngine — the authoritative countdown for a running A-Time timer.
+ * TimerEngine — the authoritative countdown for a running PaceBar timer.
  *
  * Design goals:
  *  - Pure logic, framework-free (no Electron / DOM) so it is unit-testable.

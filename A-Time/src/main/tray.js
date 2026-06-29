@@ -35,12 +35,12 @@ function buildTrayImage() {
 
 function createTray({ onToggle, onOpen, onQuit }) {
   const tray = new Tray(buildTrayImage());
-  tray.setToolTip('A-Timer');
+  tray.setToolTip('PaceBar');
 
   const contextMenu = Menu.buildFromTemplate([
-    { label: 'Open A-Timer', click: () => onOpen && onOpen() },
+    { label: 'Open PaceBar', click: () => onOpen && onOpen() },
     { type: 'separator' },
-    { label: 'Quit A-Timer', click: () => onQuit && onQuit() }
+    { label: 'Quit PaceBar', click: () => onQuit && onQuit() }
   ]);
 
   // Left-click toggles the popover beneath the icon; right-click shows the
@@ -57,7 +57,7 @@ function createTray({ onToggle, onOpen, onQuit }) {
       try {
         tray.setTitle(text ? ` ${text}` : '');
       } catch (err) {
-        console.error('[A-Time] tray.setTitle failed:', err);
+        console.error('[PaceBar] tray.setTitle failed:', err);
       }
     },
     destroy() {

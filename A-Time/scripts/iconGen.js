@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Pure-Node icon generation: rasterizes A-Time's colorful timer/progress icon
+ * Pure-Node icon generation: rasterizes PaceBar's colorful timer/progress icon
  * into RGBA buffers and encodes them as PNG using only Node built-ins (zlib).
  *
  * This is used by scripts/generate-icons.js to write the app + tray icons, and

@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Generates all icon assets from the procedurally-drawn A-Time icon:
+ * Generates all icon assets from the procedurally-drawn PaceBar icon:
  *   - build/icon.png            (1024px app icon source)
  *   - build/tray/trayIcon.png   (22px) and trayIcon@2x.png (44px) menu bar icons
  *   - build/icon.iconset/*      (all sizes) -> build/icon.icns via `iconutil`

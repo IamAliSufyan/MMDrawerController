@@ -23,7 +23,7 @@ function createMainWindow() {
     minWidth: 560,
     minHeight: 480,
     show: false,
-    title: 'A-Timer',
+    title: 'PaceBar',
     titleBarStyle: 'hiddenInset',
     // Liquid-glass: translucent vibrancy material behind the UI. The window
     // keeps its frame/traffic lights; the CSS uses translucent surfaces so the

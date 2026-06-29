@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * Time calculation & reconciliation logic for A-Time.
+ * Time calculation & reconciliation logic for PaceBar.
  *
  * All durations in this module are expressed in **seconds** unless a function
  * name explicitly says otherwise. Keeping this logic pure (no Electron, no DOM)

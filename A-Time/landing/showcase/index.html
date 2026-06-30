@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PaceBar — The presentation timer that floats over everything</title>
+  <meta name="description" content="See PaceBar in action: a click-through overlay timeline, a quick timer builder, a menu-bar launcher, a calm countdown and live pacing — all on macOS. Free & open source." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect x='1' y='9' width='4.5' height='6' rx='1.5' fill='%23E2533B'/%3E%3Crect x='6.5' y='9' width='4.5' height='6' rx='1.5' fill='%23E89B2E'/%3E%3Crect x='12' y='9' width='4.5' height='6' rx='1.5' fill='%232E9E6B'/%3E%3Crect x='17.5' y='9' width='4.5' height='6' rx='1.5' fill='%232B7C86'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="nav" id="nav">
+    <div class="container nav-inner">
+      <a class="brand" href="#top"><span class="mark"><i style="--c:#E2533B"></i><i style="--c:#E89B2E"></i><i style="--c:#2E9E6B"></i><i style="--c:#2B7C86"></i></span><span class="wordmark">PaceBar</span></a>
+      <nav class="nav-links">
+        <a href="#overlay">Overlay</a>
+        <a href="#build">Build</a>
+        <a href="#menubar">Menu bar</a>
+        <a href="#pacing">Pacing</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a class="btn btn-ink btn-sm" data-download href="https://github.com/IamAliSufyan/MMDrawerController/releases/latest">Download</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="container hero-copy">
+        <span class="pill reveal-u">macOS · Free &amp; open source</span>
+        <h1 class="reveal-u">The presentation timer<br />that floats over everything.</h1>
+        <p class="sub reveal-u">PaceBar puts a thin, click‑through timeline at the top of your screen and paces your talk section by section — above your slides, your demo, any app.</p>
+        <div class="hero-cta reveal-u">
+          <a class="btn btn-ink" data-download href="https://github.com/IamAliSufyan/MMDrawerController/releases/latest">↓ Download for macOS</a>
+          <a class="btn btn-soft" href="https://github.com/IamAliSufyan/MMDrawerController" target="_blank" rel="noopener">View on GitHub</a>
+        </div>
+      </div>
+
+      <!-- Hero scene: a Mac with the live overlay over slides -->
+      <div class="container scene-wrap reveal-u">
+        <div class="scene">
+          <div class="mac">
+            <div class="mac-bar">
+              <span class="dots"><i></i><i></i><i></i></span>
+              <span class="mac-bar-right">
+                <span class="tray"><b style="--c:#E2533B"></b><b style="--c:#E89B2E"></b><b style="--c:#2E9E6B"></b><b style="--c:#2B7C86"></b></span>
+                <span class="tray-time" id="trayTime">12:00</span>
+                <span class="clock">9:41</span>
+              </span>
+            </div>
+            <div class="mac-body">
+              <div class="overlay-mock" id="heroOverlay" data-labels="1"></div>
+              <div class="keynote">
+                <div class="kn-title">Designing for Calm</div>
+                <div class="kn-bar" style="width:64%"></div>
+                <div class="kn-bar" style="width:46%"></div>
+                <div class="kn-bar" style="width:54%"></div>
+                <div class="kn-foot">Your slides keep running underneath — fully clickable.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="container trust reveal-u">Apple Silicon &amp; Intel · macOS 12+ · no account · nothing leaves your Mac</p>
+    </section>
+
+    <!-- ===== Overlay ===== -->
+    <section class="feat" id="overlay">
+      <div class="container feat-grid">
+        <div class="feat-copy reveal-l">
+          <span class="kick">The overlay</span>
+          <h2>A bar you can read at a glance.</h2>
+          <p>One horizontal bar, split into your sections. Each fills with its own colour as you go, with the current section name, its time left, and the total — and a control cluster that's the only clickable part.</p>
+          <ul class="mini-list">
+            <li>Drag to move · drag the edge to resize</li>
+            <li>Light &amp; dark, automatically</li>
+            <li>Pause, restart, stop &amp; settings, one click away</li>
+          </ul>
+        </div>
+        <div class="feat-art reveal-r">
+          <div class="art-card">
+            <div class="overlay-mock big" id="overlayShowcase" data-labels="1"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Build ===== -->
+    <section class="feat alt" id="build">
+      <div class="container feat-grid reverse">
+        <div class="feat-copy reveal-r">
+          <span class="kick">Build a talk</span>
+          <h2>Plan your timing in under a minute.</h2>
+          <p>Name your timer, add sections with a slider or exact minutes and seconds, pick colours, and drag to reorder. Enter a total and PaceBar splits it for you — or warns you if the parts don't add up.</p>
+          <ul class="mini-list">
+            <li>Section slider + precise mm:ss</li>
+            <li>Drag to reorder · auto colour palette</li>
+            <li>Smart total / section reconciliation</li>
+          </ul>
+        </div>
+        <div class="feat-art reveal-l">
+          <div class="panel form-mock">
+            <div class="panel-h"><span>New Timer</span><span class="panel-save">Create</span></div>
+            <div class="field"><span class="field-l">Name</span><div class="field-in">Conference Keynote</div></div>
+            <div class="field"><span class="field-l">Total</span><div class="field-in mono">18 : 00</div></div>
+            <div class="srows" id="formRows"></div>
+            <button class="addbtn">+ Add Section</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Menu bar ===== -->
+    <section class="feat" id="menubar">
+      <div class="container feat-grid">
+        <div class="feat-copy reveal-l">
+          <span class="kick">Right from the menu bar</span>
+          <h2>Your timers, one click away.</h2>
+          <p>PaceBar lives in the menu bar — no Dock clutter. Click the colourful icon for a compact popover: start any saved timer, or jump straight into editing. The remaining time shows right beside the icon while you present.</p>
+        </div>
+        <div class="feat-art reveal-r">
+          <div class="popover-mock">
+            <div class="pop-h"><span class="pop-title">PaceBar</span><span class="pop-gear" aria-hidden="true">⚙</span></div>
+            <button class="pop-new">+ New Timer</button>
+            <div class="pop-cards" id="popCards"></div>
+            <div class="pop-foot"><button class="pop-quit">Quit</button></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Countdown ===== -->
+    <section class="feat alt" id="countdown">
+      <div class="container feat-grid reverse">
+        <div class="feat-copy reveal-r">
+          <span class="kick">A calm start</span>
+          <h2>3 · 2 · 1, then you're live.</h2>
+          <p>Press play and a clean, silent full‑screen countdown rolls — so you and your audience know exactly when the clock starts. Then the overlay slides in and the pacing begins.</p>
+        </div>
+        <div class="feat-art reveal-l">
+          <div class="count-mock"><span class="count-num" id="countNum">3</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Settings ===== -->
+    <section class="feat" id="settings">
+      <div class="container feat-grid">
+        <div class="feat-copy reveal-l">
+          <span class="kick">Made for your setup</span>
+          <h2>Tune it to your screen.</h2>
+          <p>Adjust the overlay's height and opacity, choose which monitor it appears on, prevent sleep while presenting, and decide what happens when time runs out — all from Settings, applied instantly.</p>
+        </div>
+        <div class="feat-art reveal-r">
+          <div class="panel settings-mock">
+            <div class="set-row"><span>Overlay height</span><div class="slider" data-val="0.55"><div class="slider-fill"></div><div class="slider-knob"></div></div></div>
+            <div class="set-row"><span>Opacity</span><div class="slider" data-val="0.9"><div class="slider-fill"></div><div class="slider-knob"></div></div></div>
+            <div class="set-row"><span>Monitor</span><div class="segmented"><button class="seg on">Main</button><button class="seg">All</button><button class="seg">Specific</button></div></div>
+            <div class="set-row"><span>Open at login</span><span class="toggle" id="tog1"><i></i></span></div>
+            <div class="set-row"><span>Count up after time's up</span><span class="toggle on" id="tog2"><i></i></span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Pacing band (overrun) ===== -->
+    <section class="band" id="pacing">
+      <div class="container band-inner">
+        <div class="reveal-u band-copy">
+          <span class="kick light">Never run over</span>
+          <h2>Green to amber to <span class="red">red</span> — then overrun.</h2>
+          <p>The active section eases to amber, flashes red near the end, and if you go past your slot the bar keeps counting up in red so you know exactly how far over you are.</p>
+        </div>
+        <div class="reveal-u band-art">
+          <div class="overlay-mock big dark" id="overrunShowcase" data-labels="1"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Use cases ===== -->
+    <section class="feat" id="use-cases">
+      <div class="container">
+        <div class="uc-head reveal-u"><span class="kick">Who it's for</span><h2>Anyone on the clock.</h2></div>
+        <div class="uc-grid">
+          <div class="uc reveal-u"><div class="uc-ic">🎤</div><h3>Conference &amp; keynote</h3><p>Hit your slot without watching the back wall.</p></div>
+          <div class="uc reveal-u"><div class="uc-ic">🏆</div><h3>Public speaking</h3><p>Green‑amber‑red pacing for timed speeches.</p></div>
+          <div class="uc reveal-u"><div class="uc-ic">🎓</div><h3>Teachers &amp; classes</h3><p>Keep lectures and webinars on schedule.</p></div>
+          <div class="uc reveal-u"><div class="uc-ic">⛪</div><h3>Live events &amp; AV</h3><p>Pace a run‑of‑show everyone can follow.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== FAQ ===== -->
+    <section class="feat alt" id="faq">
+      <div class="container">
+        <div class="uc-head reveal-u"><span class="kick">Good to know</span><h2>Questions, answered.</h2></div>
+        <div class="faq-list" id="faqList"></div>
+      </div>
+    </section>
+
+    <!-- ===== CTA ===== -->
+    <section class="cta">
+      <div class="container cta-inner reveal-u">
+        <h2>Ready to keep your next talk on time?</h2>
+        <p>Free, open source, and private. Download PaceBar for macOS.</p>
+        <div class="hero-cta">
+          <a class="btn btn-ink" data-download href="https://github.com/IamAliSufyan/MMDrawerController/releases/latest">↓ Download for macOS</a>
+          <a class="btn btn-soft" href="https://github.com/IamAliSufyan/MMDrawerController" target="_blank" rel="noopener">Star on GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <a class="brand" href="#top"><span class="mark"><i style="--c:#E2533B"></i><i style="--c:#E89B2E"></i><i style="--c:#2E9E6B"></i><i style="--c:#2B7C86"></i></span><span class="wordmark">PaceBar</span></a>
+      <p class="footer-note">A macOS presentation timer · free &amp; open source · © <span id="year"></span></p>
+      <a class="footer-link" href="https://github.com/IamAliSufyan/MMDrawerController" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

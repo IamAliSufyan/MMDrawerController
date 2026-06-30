@@ -1,48 +1,64 @@
-# PaceBar — Landing Page
+# PaceBar — Landing Pages
 
-A single-page, dependency-free marketing site for **PaceBar** (vanilla
-HTML/CSS/JS, no build step). Dark, stagetimer-inspired design with scroll-reveal
-animations, a sticky blurred nav, an interactive animated overlay-bar demo, and
-an accordion FAQ. Respects `prefers-reduced-motion`.
+Two complete, dependency-free landing pages for **PaceBar** (vanilla HTML/CSS/JS,
+no build step). Open `index.html` for a chooser, or go straight to either:
 
 ```
 landing/
-├── index.html   # all sections: hero, value props, USP, features, use cases,
-│                #   how-it-works, warnings/overrun highlight, FAQ, CTA, footer
-├── styles.css   # design system + responsive layout + animations
-└── app.js       # reveal observer, sticky nav, FAQ, feature grid, live demos
+├── index.html          # version chooser (links to both)
+├── editorial/          # Version A — editorial / print-inspired
+│   ├── index.html
+│   ├── styles.css
+│   └── app.js
+└── showcase/           # Version B — product / app showcase
+    ├── index.html
+    ├── styles.css
+    └── app.js
 ```
+
+### Version A — Editorial
+Ink-on-paper, print-inspired layout with a **timeline-ruler** motif, monospace
+numerals, hairline rules and a numbered section index. Restrained, confident,
+no gradients.
+
+### Version B — Product showcase
+An app-style page that pairs copy with **animated recreations of the real app
+UI** — the click-through overlay bar, the timer builder (sections, sliders,
+colours), the menu-bar popover, the 3·2·1 countdown, the settings panel, and the
+warnings/overrun state. Light and airy.
+
+Both use the same curated warm palette (vermillion · amber · green · teal — no
+blue/purple, no gradients) and respect `prefers-reduced-motion`.
 
 ## Run locally
 
-It's static — just open `index.html`, or serve the folder:
+They're static — just open a file, or serve the folder:
 
 ```bash
 cd landing
-python3 -m http.server 8080   # then visit http://localhost:8080
+python3 -m http.server 8080      # then visit http://localhost:8080
+# or simply:  open index.html
 ```
 
 ## Deploy (free)
 
-**GitHub Pages**
-1. Push the repo to GitHub.
-2. Settings → Pages → Source: deploy from a branch, folder `/landing`
-   (or move these files to `/docs` and point Pages at `/docs`).
+Pick the version you want to ship and point your host at that subfolder
+(`landing/editorial` or `landing/showcase`), or deploy the whole `landing/`
+folder and let visitors choose from `index.html`.
 
-**Netlify / Vercel / Cloudflare Pages**
-- New project from the repo, set the **publish/output directory** to `landing`,
-  no build command. Done.
+- **GitHub Pages:** Settings → Pages → deploy from branch, folder `/landing`
+  (or copy your chosen version's files into `/docs`).
+- **Netlify / Vercel / Cloudflare Pages:** new project from the repo, set the
+  publish directory to `landing` (or `landing/showcase`), no build command.
 
 ## Before going live — update these
 
-- **Download link:** the buttons marked `data-download` point to
-  `https://github.com/IamAliSufyan/MMDrawerController/releases/latest`. Point
-  them at your real `.dmg` release (or a direct download URL) once published.
-- **GitHub links:** update the repo URL if it changes.
-- **Social preview:** the `og:` meta tags are set; add an `og:image` (e.g. a
-  1200×630 screenshot of the app) for nicer link unfurls.
-- **Domain:** set a custom domain in your host if you have one.
+- **Download link:** buttons marked `data-download` point to
+  `…/releases/latest`. Point them at your real `.dmg` once published.
+- **GitHub links:** update if the repo moves.
+- **Social preview:** add an `og:image` (a real screenshot/recording) for nicer
+  link unfurls.
 
-The hero and highlight demos are pure CSS/JS recreations of the real overlay, so
-no screenshots are required — but a short screen-recording of the app in action
-would make a great addition near the hero.
+The component mockups are pure CSS/JS recreations of the app UI, so no
+screenshots are required — but a short screen-recording of the real app would
+make a great addition near the hero.
